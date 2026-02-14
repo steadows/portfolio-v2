@@ -22,6 +22,8 @@ interface HUDBracketProps {
   className?: string;
   /** Additional classes for the inner content area */
   contentClassName?: string;
+  /** Show corner bracket lines and dots — defaults to true */
+  corners?: boolean;
 }
 
 const colorMap: Record<AccentColor, {
@@ -79,6 +81,7 @@ export function HUDBracket({
   animated = false,
   className,
   contentClassName,
+  corners = true,
 }: HUDBracketProps) {
   const colors = colorMap[accentColor];
 
@@ -96,83 +99,87 @@ export function HUDBracket({
         className
       )}
     >
-      {/* ── Top-left corner ── */}
-      <div
-        className={cn(
-          "pointer-events-none absolute top-0 left-0 border-t border-l",
-          colors.border,
-          animated && colors.glow
-        )}
-        style={cornerStyle}
-        aria-hidden="true"
-      />
+      {corners && (
+        <>
+          {/* ── Top-left corner ── */}
+          <div
+            className={cn(
+              "pointer-events-none absolute top-0 left-0 border-t border-l",
+              colors.border,
+              animated && colors.glow
+            )}
+            style={cornerStyle}
+            aria-hidden="true"
+          />
 
-      {/* ── Top-right corner ── */}
-      <div
-        className={cn(
-          "pointer-events-none absolute top-0 right-0 border-t border-r",
-          colors.border,
-          animated && colors.glow
-        )}
-        style={cornerStyle}
-        aria-hidden="true"
-      />
+          {/* ── Top-right corner ── */}
+          <div
+            className={cn(
+              "pointer-events-none absolute top-0 right-0 border-t border-r",
+              colors.border,
+              animated && colors.glow
+            )}
+            style={cornerStyle}
+            aria-hidden="true"
+          />
 
-      {/* ── Bottom-left corner ── */}
-      <div
-        className={cn(
-          "pointer-events-none absolute bottom-0 left-0 border-b border-l",
-          colors.border,
-          animated && colors.glow
-        )}
-        style={cornerStyle}
-        aria-hidden="true"
-      />
+          {/* ── Bottom-left corner ── */}
+          <div
+            className={cn(
+              "pointer-events-none absolute bottom-0 left-0 border-b border-l",
+              colors.border,
+              animated && colors.glow
+            )}
+            style={cornerStyle}
+            aria-hidden="true"
+          />
 
-      {/* ── Bottom-right corner ── */}
-      <div
-        className={cn(
-          "pointer-events-none absolute right-0 bottom-0 border-b border-r",
-          colors.border,
-          animated && colors.glow
-        )}
-        style={cornerStyle}
-        aria-hidden="true"
-      />
+          {/* ── Bottom-right corner ── */}
+          <div
+            className={cn(
+              "pointer-events-none absolute right-0 bottom-0 border-b border-r",
+              colors.border,
+              animated && colors.glow
+            )}
+            style={cornerStyle}
+            aria-hidden="true"
+          />
 
-      {/* ── Corner dots (decorative pips) ── */}
-      <div
-        className={cn(
-          "pointer-events-none absolute top-0 left-0 -translate-x-[1px] -translate-y-[1px] h-[3px] w-[3px] rounded-full",
-          colors.dotBg,
-          "opacity-60"
-        )}
-        aria-hidden="true"
-      />
-      <div
-        className={cn(
-          "pointer-events-none absolute top-0 right-0 translate-x-[1px] -translate-y-[1px] h-[3px] w-[3px] rounded-full",
-          colors.dotBg,
-          "opacity-60"
-        )}
-        aria-hidden="true"
-      />
-      <div
-        className={cn(
-          "pointer-events-none absolute bottom-0 left-0 -translate-x-[1px] translate-y-[1px] h-[3px] w-[3px] rounded-full",
-          colors.dotBg,
-          "opacity-60"
-        )}
-        aria-hidden="true"
-      />
-      <div
-        className={cn(
-          "pointer-events-none absolute right-0 bottom-0 translate-x-[1px] translate-y-[1px] h-[3px] w-[3px] rounded-full",
-          colors.dotBg,
-          "opacity-60"
-        )}
-        aria-hidden="true"
-      />
+          {/* ── Corner dots (decorative pips) ── */}
+          <div
+            className={cn(
+              "pointer-events-none absolute top-0 left-0 -translate-x-[1px] -translate-y-[1px] h-[3px] w-[3px] rounded-full",
+              colors.dotBg,
+              "opacity-60"
+            )}
+            aria-hidden="true"
+          />
+          <div
+            className={cn(
+              "pointer-events-none absolute top-0 right-0 translate-x-[1px] -translate-y-[1px] h-[3px] w-[3px] rounded-full",
+              colors.dotBg,
+              "opacity-60"
+            )}
+            aria-hidden="true"
+          />
+          <div
+            className={cn(
+              "pointer-events-none absolute bottom-0 left-0 -translate-x-[1px] translate-y-[1px] h-[3px] w-[3px] rounded-full",
+              colors.dotBg,
+              "opacity-60"
+            )}
+            aria-hidden="true"
+          />
+          <div
+            className={cn(
+              "pointer-events-none absolute right-0 bottom-0 translate-x-[1px] translate-y-[1px] h-[3px] w-[3px] rounded-full",
+              colors.dotBg,
+              "opacity-60"
+            )}
+            aria-hidden="true"
+          />
+        </>
+      )}
 
       {/* ── Top bar: label + status ── */}
       {(label || status) && (

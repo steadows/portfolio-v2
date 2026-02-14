@@ -508,11 +508,19 @@ export const projects: Project[] = [
     title: "DINNERBOT",
     subtitle: "AI-Powered Meal Planning",
     category: "ml",
-    tags: ["Gemini LLM", "Serverless", "GCP", "Telegram Bot", "Firestore"],
+    tags: [
+      "Gemini LLM",
+      "Serverless",
+      "GCP",
+      "Telegram Bot",
+      "Firestore",
+      "Conversational AI",
+      "Intent Detection",
+    ],
     description:
       "Serverless weekly meal planner powered by Google Gemini with a Gordon Ramsay persona. Generates dinner options, handles selections via Telegram, and produces aisle-grouped grocery lists.",
     longDescription:
-      "A production-deployed serverless application that generates three weekly dinner options using Google Gemini's LLM (with a Gordon Ramsay persona), delivered through an interactive Telegram bot. Users select meals via inline keyboard buttons or conversational text, and the system generates aisle-grouped grocery lists. Features include meal history tracking, favorites, feedback collection, conversational AI with memory of past meals and preferences, and on-demand recipe generation. Built on Google Cloud Platform with Cloud Functions (2nd Gen), Firestore for persistent storage, Cloud Scheduler for weekly automation, and Secret Manager for credentials. Uses the RISEN prompting framework for structured LLM interactions.",
+      "A production-deployed serverless application that generates personalized weekly dinner options using Google Gemini (with a Gordon Ramsay persona), delivered through an interactive Telegram bot with inline keyboard selection. Features a full conversational AI layer with 9-intent detection, memory-enriched context (last 10 messages with metadata, meal history, auto-favorites, staleness detection, pending feedback loops), aisle-grouped grocery list generation, and on-demand recipe expansion. Built on Google Cloud Platform with Cloud Functions (2nd Gen), Firestore, Cloud Scheduler, and Secret Manager. All LLM prompts use the RISEN framework with XML-structured tags for consistent, high-quality outputs.",
     techStack: [
       "Python",
       "Google Gemini",
@@ -520,11 +528,63 @@ export const projects: Project[] = [
       "Firestore",
       "Telegram Bot API",
       "Cloud Scheduler",
+      "Secret Manager",
+      "Cloud Build",
       "Flask",
     ],
     image: "/projects/dinnerbot.png",
     github: "https://github.com/steadows/dinnerbot",
     featured: true,
+    detail: {
+      sections: [
+        {
+          id: "overview",
+          title: "OVERVIEW",
+          content:
+            "DinnerBot is a production-deployed serverless application that generates personalized weekly dinner menus, delivers them through Telegram, and produces aisle-grouped grocery lists — all through the persona of Gordon Ramsay. The project started from a simple question: what if you had a private executive chef who knew your family's dietary constraints, remembered what you've cooked recently, and could plan your dinners with a single message?\n\nThe system runs on Google Cloud Platform as a pair of Cloud Functions: one triggered weekly by Cloud Scheduler to generate three dinner options tailored to the family's profile (high protein, no wheat/mushrooms/olives/seed oils, hidden vegetables for a toddler), and a second serving as a Telegram webhook to handle all inbound interactions — button taps, text commands, conversational messages, and feedback. Google Gemini powers the language model, structured through the **RISEN prompting framework** with XML tags for consistent, high-quality outputs.\n\nWhat elevates DinnerBot beyond a simple recipe generator is its conversational intelligence layer. The bot tracks conversation history with metadata enrichment, detects nine distinct intents from free-form text, maintains meal history with auto-favoriting, detects interaction staleness, and proactively solicits meal feedback — all while staying in character as a warm, practical Gordon Ramsay who remembers what the family loves.",
+        },
+        {
+          id: "architecture",
+          title: "ARCHITECTURE",
+          content:
+            "DinnerBot follows a **service-oriented architecture** with five distinct modules, each responsible for a single domain:\n\n**LLMService** — Google Gemini integration with five RISEN-framework prompts (recipe generation, grocery list, recipe detail, conversational, retry fallback). Handles intent detection via keyword/regex matching, JSON response parsing with validation, and a retry strategy with progressively simpler prompts. Falls back to hardcoded DEFAULT_RECIPES when all retries are exhausted.\n\n**DBService** — Firestore CRUD layer managing three collections: meal_sessions (recipe options with selection state machine), meal_history (per-recipe tracking with selection counts, favorite status, and feedback), and conversation_history (message log with metadata, staleness timestamps, and pending feedback state). Documents are keyed by platform-prefixed user_id to support future multi-platform expansion.\n\n**TelegramService** — Telegram Bot API wrapper handling outbound message formatting (HTML for recipes, plain text for grocery lists), inline keyboard construction with session-encoded callback data, callback query acknowledgment, and slash command registration with BotFather. Uses a persistent asyncio event loop to bridge Telegram's async API with Flask's synchronous request model.\n\n**Config** — Two-tier configuration abstraction: environment variables for local development (.env via python-dotenv), Google Secret Manager for production. Properties are lazy-loaded with a sentinel pattern to distinguish \"not initialized\" from \"initialization failed.\"\n\n**UserProfileService** — Family profile management with Firestore-backed overrides merged on top of sensible defaults. Profiles include dietary restrictions, equipment availability, portion preferences, skill level, and special instructions (hidden vegetables, leftover-friendly meals, no-fuss weeknight cooking).\n\nThe entry points live in main.py — two Cloud Functions that serve as thin HTTP handlers, delegating all logic to the service modules. The cron trigger generates and sends recipes; the webhook handler validates, routes, and responds to all inbound Telegram updates.",
+        },
+        {
+          id: "conversational-ai",
+          title: "CONVERSATIONAL AI",
+          content:
+            "The conversational AI layer is what makes DinnerBot feel like an actual chef rather than a command-line tool. At its core is the **RISEN (Role, Instructions, Steps, End goal, Narrowing)** prompting framework — every prompt sent to Gemini is structured with XML tags (<role>, <instructions>, <steps>, <end_goal>, <narrowing>) that separate instructions from dynamic data, producing consistent, high-quality outputs.\n\n**Context Assembly** — Each conversational response draws from five context sources injected into the prompt via dedicated XML sections: <family_profile> (dietary constraints, equipment, preferences), <meal_history> (last 5 meals with timestamps, selection counts, favorite status), <conversation_history> (last 10 messages with metadata-enriched descriptions), <pending_meals> (current menu options if active), and optional <staleness> and <pending_feedback> tags that shape the conversational tone.\n\n**Metadata Enrichment** — Raw conversation logs are transformed into semantically rich context before being injected into prompts. A user message of \"2\" becomes \"User selected Butter Chicken.\" A message of \"favorites\" becomes \"User asked to see their favorites.\" This enrichment layer ensures Gemini understands the conversational arc rather than seeing a stream of cryptic numbers and keywords.\n\n**Memory Systems** — The bot maintains two forms of memory: short-term conversation history (last 10 messages with metadata) and long-term meal history (every selection, with timestamps, frequency counts, and feedback). Meals selected three or more times are automatically flagged as favorites. This enables Gordon to naturally reference past meals — \"You loved that Butter Chicken last week\" or \"We haven't done beef in a while.\"\n\n**Staleness Detection** — When more than 24 hours pass between interactions, a <staleness> context tag is injected, prompting Gordon to acknowledge the gap naturally (\"Welcome back!\" or \"Right, where were we?\") rather than continuing as if the conversation never stopped.\n\n**Feedback Loop** — After sending a grocery list, the system sets a pending_feedback flag. On the next interaction, a <pending_feedback> tag prompts Gordon to ask how the meal turned out. Feedback (\"loved it\", \"it was okay\", \"skip next time\") is parsed via sentiment extraction and stored against the meal history entry, building a preference profile over time.",
+        },
+        {
+          id: "features",
+          title: "FEATURES",
+          content:
+            "**Intent Detection** — The system routes free-form text to one of nine handlers through a keyword/regex matching pipeline: selection (meal pick), regenerate (new options), recipe_detail (expand a recipe), history (recent meals), generate_now (on-demand menu), favorites (go-to dishes), help (command list), feedback (meal review), and conversational (catch-all to Gemini). Slash commands (/start, /help, /menu, /favorites, /cancel) take priority over intent routing.\n\n**Meal Selection** — Users pick meals via inline keyboard buttons (1, 2, 3) or text replies. The handler validates the selection against the pending session, marks it complete, saves to meal history (incrementing times_selected and checking the auto-favorite threshold), and triggers grocery list generation — all as a single atomic flow.\n\n**Aisle-Grouped Grocery Lists** — After selection, Gemini generates a grocery list scaled for the family's portion size, grouped by store section (Protein, Produce, Dairy, Pantry). The prompt enforces practical quantities and respects dietary restrictions (no seed oils — butter, olive oil, avocado oil, or coconut oil only).\n\n**On-Demand Generation & Regeneration** — Users can request new menus at any time (\"what's for dinner\", \"plan dinner\") or reject current options (\"try again\", \"something else\"). The system handles the full session lifecycle — expiring old sessions, generating fresh recipes, creating new Firestore documents, and sending updated inline keyboards.\n\n**Recipe Detail Expansion** — Users can ask \"tell me more about option 2\" to get a full recipe breakdown: numbered cooking steps, the hidden-veggie strategy, protein content, and a Gordon tip — all generated on demand via a dedicated RISEN prompt.\n\n**Non-Text Handling** — Photos, stickers, voice messages, and other non-text content are detected by content type and handled gracefully with an in-character response: \"I can only read text messages, love. Type something or tap a button.\"",
+        },
+        {
+          id: "deployment",
+          title: "DEPLOYMENT",
+          content:
+            "DinnerBot runs on Google Cloud Platform as a fully serverless stack with zero always-on infrastructure:\n\n**Cloud Functions (2nd Gen)** — Two functions deployed to us-central1 with 512MB memory and 120-second timeout. The trigger function (cron_trigger_recipes) is HTTP-triggered with no public access, invoked by Cloud Scheduler with OIDC authentication. The webhook function (telegram_webhook) is publicly accessible — Telegram needs to reach it — but validated via a secret token header on every request.\n\n**Firestore** — Three collections manage all persistent state. meal_sessions stores recipe options with a selection state machine (pending_selection → completed | expired | send_failed). meal_history tracks per-recipe data with selection counts, timestamps, favorite flags, and feedback values. conversation_history maintains the message log with metadata, last_interaction_at for staleness detection, and pending_feedback state.\n\n**Cloud Scheduler** — A weekly cron job (Sundays at 10 AM Eastern) triggers the recipe generation function via authenticated HTTP POST, producing a new menu every week automatically.\n\n**Secret Manager** — Stores GEMINI_API_KEY, TELEGRAM_BOT_TOKEN, and TELEGRAM_WEBHOOK_SECRET. Cloud Functions access secrets at runtime via IAM-bound service account permissions — no credentials are embedded in code or environment variables in production.\n\n**Cloud Build** — A cloudbuild.yaml defines the CI/CD pipeline with parallel deployment of both Cloud Functions on push to main, with all secrets and environment variables configured to match the production deployment.",
+        },
+        {
+          id: "engineering-details",
+          title: "ENGINEERING DETAILS",
+          content:
+            "**Error Handling** — LLM calls are wrapped in try/except with a two-tier retry strategy: the primary RISEN prompt first, then a simplified retry prompt that strips context to maximize JSON compliance. If both fail, hardcoded DEFAULT_RECIPES ensure the user always gets a response. Telegram webhook handlers always return HTTP 200 — even on internal errors — to prevent Telegram from retrying and causing duplicate processing. All user-facing error messages stay in character: \"Bloody hell, something went wrong on my end. Give it another go in a few minutes.\"\n\n**Platform Abstraction** — Every database operation uses a platform-prefixed user_id (\"telegram_{chat_id}\") rather than raw platform identifiers. This abstraction — carried through DBService, LLMService, UserProfileService, and all handler functions — means adding a new messaging platform (SMS, WhatsApp, Discord) requires only a new service module and webhook handler, with zero changes to the core logic. The Twilio SMS extension is architecturally ready but blocked pending phone number verification.\n\n**Async Bridge** — Telegram's python-telegram-bot library is async-first, but Cloud Functions runs Flask (synchronous). TelegramService bridges this with a persistent asyncio event loop and a thread pool executor, avoiding the overhead of creating new loops per request while handling both async and synchronous calling contexts.\n\n**Session Lifecycle** — Sessions follow a state machine (pending_selection → completed | expired | send_failed) with built-in guards: selection handlers validate session ownership, status, and option validity before processing. Expired or completed sessions are rejected gracefully with in-character messages guiding the user toward valid actions.\n\n**Conversation Pruning** — Conversation history is capped at 20 stored messages (2× the 10-message context window) to prevent unbounded Firestore document growth while maintaining sufficient history for metadata-enriched context assembly.",
+        },
+      ],
+      keyMetrics: [
+        { label: "INTENT TYPES", value: "9" },
+        { label: "RISEN PROMPTS", value: "5" },
+        { label: "CONTEXT SOURCES", value: "5" },
+        { label: "SERVICE MODULES", value: "5" },
+        { label: "MEMORY WINDOW", value: "10 msgs" },
+        { label: "AUTO-FAVORITE", value: "3× selected" },
+      ],
+      team: ["Steve Meadows"],
+      timeline: "2025",
+    },
   },
 
   // ─── Statistics (Medium Priority) ──────────────────────────────────────────
@@ -533,46 +593,248 @@ export const projects: Project[] = [
     title: "LAPLACE DISTRIBUTION",
     subtitle: "Interactive Statistical Explorer",
     category: "stats",
-    tags: ["Probability", "Interactive", "Shiny", "Simulation"],
+    tags: ["Probability", "Interactive", "Shiny", "Monte Carlo", "Heavy Tails", "Simulation"],
     description:
-      "Interactive R Shiny application for exploring the Laplace (Double Exponential) distribution — featuring PDF/CDF visualization, random sampling simulation, and real-world case studies.",
+      "Interactive R Shiny application for exploring the Laplace (Double Exponential) distribution — featuring PDF/CDF visualization, Monte Carlo simulation with heavy-tail analysis, and real-world case studies.",
     longDescription:
-      "Built a comprehensive interactive web application for exploring the Laplace distribution. Features include adjustable location and scale parameters with real-time PDF/CDF visualization, Normal distribution overlay comparison highlighting heavy tails, probability and quantile calculators, random sampling with convergence demonstration, and curated case studies spanning finance (Black Swan modeling), machine learning (LASSO sparsity), and differential privacy (Laplace Mechanism).",
-    techStack: ["R", "Shiny", "ggplot2", "shinydashboard"],
+      "Built a fully interactive R Shiny web application for exploring the Laplace (Double Exponential) distribution, deployed to shinyapps.io with five tabs spanning education and computation. Features real-time PDF/CDF visualization with adjustable location and scale parameters, a Normal distribution overlay highlighting the Laplace's sharp peak and heavy tails, integrated probability and quantile calculators, a Monte Carlo simulation engine (10–10,000 samples) with convergence demonstration and empirical heavy-tail comparison metrics, and three curated real-world case studies. Built with bslib Bootstrap 5 theming, Plotly interactive charts, nimble for Laplace distribution functions not available in base R, custom JavaScript for viewport-locked layout and throttled slider input, and MathJax-rendered mathematical formulas.",
+    techStack: ["R", "Shiny", "bslib", "Plotly", "ggplot2", "nimble", "moments", "MathJax", "JavaScript", "CSS"],
     image: "/projects/laplace-distribution.png",
     liveDemo: "https://ll7bfl-steve-meadows.shinyapps.io/project_1/",
     featured: true,
+    detail: {
+      sections: [
+        {
+          id: "overview",
+          title: "OVERVIEW",
+          content:
+            "This project is a fully interactive web application built for **STA 532 — Applied Statistics** at Grand Valley State University. It provides an educational and computational exploration of the **Laplace distribution** (also known as the Double Exponential distribution) — a probability distribution first introduced in 1774 by Pierre-Simon Laplace as his \"First Law of Errors.\"\n\nThe Laplace distribution is the Normal distribution's more rugged cousin. Where the bell curve models errors based on their squared magnitude, the Laplace models errors based on their **absolute magnitude**, producing two defining characteristics: a sharp cusp at the center (ideal for data that clusters tightly around a specific value) and heavy tails (assigning much higher probability to extreme events than the Normal). These properties make it a cornerstone of robust statistical modeling in fields ranging from finance to data privacy.\n\nThe application spans **five tabs** — About, Applications, PDF, CDF, and Simulation — providing both theoretical grounding and hands-on computational tools. Users can manipulate distribution parameters in real time, compute exact probabilities and quantiles, run Monte Carlo simulations with configurable sample sizes, and compare the Laplace's behavior against the Normal distribution across every visualization. The app is deployed to **shinyapps.io** and built with approximately 1,760 lines of R, JavaScript, and CSS.",
+        },
+        {
+          id: "interactive-tools",
+          title: "INTERACTIVE TOOLS",
+          content:
+            "The core of the application is a suite of interactive visualization and computation tools spread across the PDF and CDF tabs.\n\n**PDF Explorer** — The PDF tab renders the Laplace probability density function in real time as users adjust the location parameter (µ, range −10 to 10) and scale parameter (b, range 0.1 to 5). A toggleable **Normal distribution overlay** plots a Normal curve with identical mean and variance (σ² = 2b²), making the Laplace's sharp peak and heavy tails immediately visible by direct comparison. The x-axis range is independently adjustable (−30 to 30), and four stat cards display the theoretical mean, variance (2b²), excess kurtosis (always 3), and skewness (always 0) — all updating reactively as parameters change.\n\n**CDF with Probability Calculator** — The CDF tab visualizes the cumulative distribution function with the same parameter controls. An integrated **probability calculator** evaluates P(X ≤ x) at any user-specified x value, displaying the result to six decimal places with corresponding dashed crosshair annotations on the CDF plot. A **quantile calculator** (inverse CDF) takes a probability p and returns the x value satisfying P(X ≤ x) = p, using nimble's qdexp function.\n\n**Synchronized Shaded-Area Plot** — Below the CDF curve, a second PDF plot renders in sync, shading the area under the density curve up to the user-specified x value. This dual visualization connects the abstract CDF value to its geometric interpretation on the density — users see both the cumulative probability and the corresponding shaded region simultaneously.\n\nAll plots are rendered as **Plotly interactive charts** via ggplotly, supporting hover tooltips with unified hover mode, pan/zoom, and PNG export. Slider inputs use a custom **40ms throttle** (overriding Shiny's default release-only behavior) via a JavaScript binding override, enabling smooth real-time parameter exploration without waiting for slider release.",
+        },
+        {
+          id: "simulation-engine",
+          title: "SIMULATION ENGINE",
+          content:
+            "The Simulation tab provides a full **Monte Carlo sampling engine** for empirical exploration of the Laplace distribution.\n\n**Configurable Sampling** — Users set the sample size (n = 10 to 10,000, step 10), location and scale parameters, and an optional random seed for reproducibility. Clicking \"Generate Sample\" draws n observations from the Laplace distribution using nimble's rdexp function and renders a histogram overlaid with the theoretical density curve. As n increases, the histogram visibly converges to the theoretical Laplace PDF — a direct demonstration of the Law of Large Numbers.\n\n**Normal Overlay Comparison** — A toggleable Normal distribution overlay (with matched mean and variance) can be superimposed on the simulation histogram, allowing users to compare the empirical Laplace sample against both the theoretical Laplace curve and the equivalent Normal density simultaneously.\n\n**Summary Statistics Panel** — Seven real-time summary statistics are computed from each generated sample: n, mean, median, standard deviation, kurtosis (via the moments package), minimum, and maximum. These values update with every new sample, letting users observe sampling variability and track convergence of empirical moments toward their theoretical values.\n\n**Heavy-Tail Comparison** — The most distinctive feature of the simulation tab is a four-panel comparison grid that quantifies the Laplace distribution's fat-tail property with real data. For each sample, the application computes the empirical percentage of observations falling beyond **2 standard deviations** and **3 standard deviations** from the mean, displayed alongside the Normal distribution's theoretical expectations (4.55% and 0.27%, respectively). With typical Laplace samples, users observe empirical values roughly **double** the Normal expectation at 2σ and significantly higher at 3σ — providing visceral, data-driven evidence of heavy-tail behavior.",
+        },
+        {
+          id: "real-world-applications",
+          title: "REAL-WORLD APPLICATIONS",
+          content:
+            "The Applications tab presents three curated case studies demonstrating where the Laplace distribution outperforms Normal-based models in practice. Each case study follows a consistent structure — The Problem, The Laplace Solution, and a concrete Case Study — rendered in a responsive card grid with hover effects.\n\n**Finance & Black Swans** — Traditional financial models use the Normal distribution, which treats extreme market moves as nearly impossible events. In reality, stock returns exhibit heavy tails — crashes and spikes occur far more frequently than a bell curve predicts. Analysts use the Laplace distribution to model asset returns and \"volatility smiles,\" enabling banks to calculate more realistic **Value-at-Risk (VaR)** estimates that provide adequate capital buffers for Black Swan events.\n\n**Machine Learning & Sparsity (LASSO)** — When building models with thousands of variables, identifying which features actually matter is critical. **LASSO regression** uses a Laplace prior (L1 penalty), exploiting the distribution's sharp, needle-like peak at zero to mathematically force unimportant variable coefficients to exactly zero. This produces sparse models that perform automatic feature selection — enabling researchers to identify the handful of critical genes in a genomic study or the most important indicators in an economic forecast.\n\n**Data Privacy & The Laplace Mechanism** — The cornerstone of **differential privacy** is the Laplace Mechanism: adding carefully calibrated Laplace noise to database query results. Because of the Laplace distribution's unique mathematical properties, this provides a formal privacy guarantee — the result of any query looks essentially the same whether a specific individual's data is included or not. This technique protects individual privacy in large-scale census data, tech-company analytics, and healthcare trend reporting while preserving aggregate statistical accuracy.\n\nThe tab also features a summary infographic synthesizing the distribution's key properties and applications into a single visual reference.",
+        },
+        {
+          id: "design-engineering",
+          title: "DESIGN & ENGINEERING",
+          content:
+            "Significant engineering effort went into making the application feel polished and responsive rather than a typical academic Shiny prototype.\n\n**Viewport-Locked Layout** — All interactive tabs (PDF, CDF, Simulation) are locked to the browser viewport with no page scrolling. A custom JavaScript function (resizePlots) dynamically calculates available height by subtracting the navbar, formula callouts, stat cards, and padding from the viewport height, then resizes each Plotly container to fill the remaining space. This function fires on window resize, tab switch (via Bootstrap's shown.bs.tab event), and after every Shiny render cycle — ensuring plots always fill the screen regardless of browser dimensions.\n\n**Animated Splash Screen** — The app opens with a full-screen splash overlay featuring a CSS keyframe entrance animation (fade + scale from 88% with a 15px vertical offset over 0.9s using a custom cubic-bezier easing) followed by a 5-second display period, then a cinematic exit animation (subtle brightness flash at 8%, progressive zoom-blur dissolve over 1.3s with the blur reaching 20px at full opacity fadeout). The overlay is removed from the DOM after 6.5 seconds via setTimeout.\n\n**Bootstrap 5 Theming** — The UI is built with bslib (not shinydashboard), using Bootstrap 5 with a warm color palette (primary: #E8713A, background: #FDF6EE, foreground: #1a1a2e) and Google Fonts (Inter for body text, Fira Code for monospaced elements). Custom CSS extends the theme with card hover effects (translateY lift + shadow intensification), scrollable sidebars with styled scrollbars, responsive grid breakpoints, and consistent stat card styling.\n\n**Throttled Slider Input** — Shiny's default slider behavior only sends values on mouse release. A custom JavaScript snippet overrides the shiny.sliderInput binding's getRatePolicy method, replacing it with a 40ms throttle policy. This enables smooth, real-time parameter exploration — users see the plot update continuously as they drag, not just when they release.\n\n**Pre-Rendered Hidden Tabs** — By default, Shiny suspends outputs on hidden tabs to save computation. This app sets suspendWhenHidden = FALSE for all four plot outputs and overrides Bootstrap's tab hiding with CSS (display: block with opacity/pointer-events toggling instead of display: none), ensuring all Plotly charts are pre-rendered with correct dimensions when the user first switches tabs.\n\n**Responsive Design** — The CSS includes breakpoints at 992px, 768px, and 480px that reflow card grids, adjust stat card sizing, and collapse multi-column layouts to single columns on mobile devices.",
+        },
+        {
+          id: "mathematical-foundation",
+          title: "MATHEMATICAL FOUNDATION",
+          content:
+            "The application renders all mathematical content through **MathJax**, providing publication-quality formula display inline with the interactive tools.\n\n**PDF Formula** — The probability density function is displayed as: f(x | µ, b) = (1/2b) · exp(−|x − µ|/b), defined for all real x. The formula is rendered in a callout box directly above the interactive plot, providing immediate reference as users manipulate parameters.\n\n**CDF Formula** — The piecewise cumulative distribution function is rendered with cases notation: F(x) = (1/2) · exp((x − µ)/b) for x < µ, and F(x) = 1 − (1/2) · exp(−(x − µ)/b) for x ≥ µ. This piecewise structure reflects the Laplace's construction as two back-to-back exponential distributions.\n\n**Key Properties** — The stat cards and educational content highlight the Laplace distribution's defining characteristics:\n\n• **Mean** = µ (the location parameter directly controls the center)\n• **Variance** = 2b² (grows quadratically with the scale parameter)\n• **Excess Kurtosis** = 3 (constant, independent of parameters — compared to 0 for the Normal, indicating much heavier tails)\n• **Skewness** = 0 (perfectly symmetric about µ, like the Normal)\n\n**nimble Package Integration** — The Laplace distribution functions (ddexp, pdexp, qdexp, rdexp — density, CDF, quantile, and random generation) are not available in base R. The application uses the **nimble** package, which provides these as part of its extended distribution library. This was a deliberate technical choice that enabled clean, consistent computation across all tabs without reimplementing the distribution functions from scratch.\n\n**Normal Comparison** — When the Normal overlay is enabled, the application constructs a Normal distribution with identical mean (µ) and variance (2b²), yielding σ = b√2. This matched-moment comparison isolates the distributional shape difference — the Laplace's sharper peak and heavier tails become immediately apparent, even though both distributions share the same first two moments.",
+        },
+      ],
+      keyMetrics: [
+        { label: "INTERACTIVE TABS", value: "5" },
+        { label: "LINES OF CODE", value: "~1,760" },
+        { label: "SAMPLE RANGE", value: "10–10K" },
+        { label: "CASE STUDIES", value: "3" },
+        { label: "EXCESS KURTOSIS", value: "3" },
+        { label: "SLIDER THROTTLE", value: "40ms" },
+      ],
+      team: ["Steve Meadows"],
+      course: "STA 532 — Applied Statistics",
+      timeline: "Fall 2024",
+    },
   },
   {
     slug: "gun-violence-geospatial",
     title: "GUN VIOLENCE ANALYSIS",
     subtitle: "Geospatial Intelligence",
     category: "stats",
-    tags: ["Geospatial", "Visualization", "Statistical Modeling", "Public Policy"],
+    tags: [
+      "Geospatial",
+      "Visualization",
+      "Hypothesis Testing",
+      "Permutation Testing",
+      "Bootstrap",
+      "Census Data",
+      "Public Policy",
+    ],
     description:
-      "Comprehensive geospatial analysis of gun violence patterns across the United States, revealing regional trends and socioeconomic correlations.",
+      "Multi-scale geospatial analysis of U.S. gun violence integrating Gun Violence Archive data with Census Bureau demographics. Revealed that poverty predicts lethality — not incidence — through Welch's t-test, permutation testing, and bootstrap inference.",
     longDescription:
-      "Conducted a thorough geospatial analysis of gun violence incidents across the U.S., combining spatial statistics with socioeconomic indicators. Built interactive visualizations revealing temporal patterns, geographic clustering, and demographic correlations to inform data-driven policy discussion.",
-    techStack: ["R", "ggplot2", "sf", "leaflet", "tidyverse"],
+      "Conducted a rigorous multi-scale geospatial and statistical analysis of ~239K gun violence incidents (Gun Violence Archive, 2014–2017) integrated with U.S. Census Bureau state-level and county-level demographic data — population, income, poverty, rent, housing costs, and gender proportions. Built an interactive Leaflet choropleth from TIGER/Line shapefiles, developed a custom geoid recovery strategy achieving 99.8% geographic completeness, and performed per-capita normalization revealing that raw counts are deeply misleading. Correlation analysis uncovered the central finding: poverty has near-zero correlation with gun violence incidence but moderate positive correlation with death rates — poverty predicts whether people die, not whether violence happens. Validated through Welch's t-test (p = 0.033), 1,000-permutation Monte Carlo test (p = 0.011), and 10,000-sample bootstrap confidence interval [11.6, 48.0] deaths per 100K.",
+    techStack: [
+      "R",
+      "tidyverse",
+      "sf",
+      "leaflet",
+      "Plotly",
+      "ggplot2",
+      "ggcorrplot",
+      "naniar",
+      "flextable",
+      "infer",
+      "lubridate",
+      "skimr",
+      "scales",
+    ],
     image: "/projects/gun-violence.png",
     github: "https://github.com/steadows",
     liveDemo: "https://steadows.github.io/240612_meadoant_final_project.html",
     featured: true,
+    detail: {
+      sections: [
+        {
+          id: "overview",
+          title: "OVERVIEW",
+          content:
+            "This project is a comprehensive geospatial and statistical analysis of gun violence in the United States, completed for **STA 418/518 — Introduction to Statistics** at Grand Valley State University. The primary dataset comes from the **Gun Violence Archive (GVA)**, a nonprofit that collects verified records of gun-related incidents across the U.S. The raw dataset contains approximately 239,000 incidents spanning January 2013 through March 2018, with each record capturing location (state, city, geoid, latitude/longitude), date, number killed, number injured, and dozens of participant-level attributes.\n\nBecause 2013 and 2018 are incomplete in the archive (only 279 incidents from 2013, notably missing the Las Vegas mass shooting), the analysis filters to a clean four-year window: **2014–2017**, providing consistent year-over-year comparisons. To move beyond raw counts, the project integrates **U.S. Census Bureau** state-level and county-level demographic data — population, median income, poverty rates, rent costs, housing costs, and gender proportions — enabling per-capita normalization and socioeconomic correlation analysis.\n\nThe project proceeds through a deliberate analytical arc: data cleaning and missingness recovery, state-level exploratory analysis with per-capita normalization, city-level drill-down with correlation matrices, interactive geospatial visualization via Leaflet, and rigorous inferential statistics — Welch's t-test, permutation testing, and bootstrap confidence intervals — all converging on a central finding about the relationship between poverty and gun violence lethality.",
+        },
+        {
+          id: "data-cleaning",
+          title: "DATA CLEANING",
+          content:
+            "The raw GVA dataset required several preprocessing steps before analysis. Date strings were parsed to datetime format using **lubridate**, enabling extraction of year and month for temporal analysis. City names were cleaned by stripping parenthetical qualifiers and trimming whitespace to ensure consistent joins with Census data.\n\n**Missingness Analysis** — An initial missingness plot (via **naniar**'s gg_miss_var) revealed that latitude, longitude, and geoid values were the most incomplete fields — and their missingness was correlated: rows missing lat/long were almost always missing geoid as well. A state-level missingness heatmap identified Idaho, Indiana, South Dakota, Virginia, and West Virginia as the states with the highest proportions of missing location data.\n\n**Geoid Recovery Strategy** — The geoid (geographic identifier) is critical for merging incident data with Census Bureau shapefiles and demographic tables. Over **8,000 rows** were missing geoid values. Rather than dropping these records, the project implemented a custom imputation approach: for each incident missing a geoid, the system cross-referenced other incidents sharing the same **city, state, and year** that had valid geoids, and copied the geoid over. This strategy reduced missing geoid values from 8,000+ to just **443** — achieving **99.8% completeness** for the geographic identifier. Post-recovery, only Hawaii, Idaho, Vermont, and West Virginia retained missingness above 1%, and these states contribute minimally to the top incident and death counts.\n\n**Post-Cleaning Validation** — After recovery, a bar plot of remaining missing geoids by state confirmed that the highest absolute counts of nulls occurred in high-incident states (where a few hundred missing out of tens of thousands is negligible), while the proportional missingness in smaller states was confirmed as statistically inconsequential to downstream analysis.",
+        },
+        {
+          id: "state-level-analysis",
+          title: "STATE-LEVEL ANALYSIS",
+          content:
+            "State-level analysis began with 2017 — the year with the highest incident count — using raw incident totals. The initial bar chart showed Illinois, California, Florida, and Texas dominating, which tracks intuitively with population. But raw counts are misleading.\n\n**Per-Capita Normalization** — By merging state-level Census population data and computing **incidents per 100,000 people**, the rankings shifted dramatically. The **District of Columbia** emerged as an extreme outlier — but DC is a federal district functioning more like a single city than a state, so it was excluded for fair state-to-state comparison. With DC removed, **Alaska** took the top spot, followed by **Delaware** — two states rarely associated with gun violence in popular discourse. Illinois, despite its reputation, ranked substantially lower after population adjustment.\n\n**Gun Ownership Tangent** — Alaska's per-capita dominance prompted investigation into gun ownership rates. Alaska has an estimated 64.5% gun ownership rate (the highest in the nation), suggesting a plausible correlative factor. However, Delaware — ranked 2nd in per-capita incidents — has only 34.4% gun ownership (10th lowest), and Illinois ranks 7th lowest at 27.8%. This inconsistency between ownership rates and incident rates indicated that gun ownership alone is an insufficient explanatory variable, motivating deeper analysis at the city level.\n\n**Interactive Leaflet Choropleth** — To visualize the geographic distribution, U.S. Census Bureau **TIGER/Line shapefiles** (cb_2018_us_state_500k) were loaded via the **sf** package, merged with the per-capita incident data on formatted GEOID, transformed to WGS84 CRS, and rendered as a **Leaflet choropleth map**. The map uses population-normalized coloring (PuBu palette with quantile-based bins) and HTML popup labels displaying state name, population, raw incident count, and per-capita rate on hover.\n\n**Boxplot of Top 15 States (2014–2017)** — A horizontal boxplot visualized the range of per-capita incident rates across all four years for the top 15 states, showing which states had consistent rates versus high year-to-year variability. This temporal stability check confirmed that the 2017 rankings were representative of broader trends, not single-year anomalies.",
+        },
+        {
+          id: "city-level-analysis",
+          title: "CITY-LEVEL ANALYSIS",
+          content:
+            "Having established the state-level landscape, the analysis drilled down to the city level to uncover more granular patterns. County-level Census data was joined with incident records on geoid, and the top 15 cities by raw incident count in 2017 were identified.\n\n**Incidents vs. Deaths Per Capita** — Two side-by-side bar charts compared the top 15 cities by incidents per 100K and deaths per 100K. A critical observation emerged: the rankings shifted significantly between the two metrics. **St. Louis, MO** stood out with a **36% lethality rate** — over a third of all gun violence incidents in St. Louis resulted in death in 2017. This was far above the average for other top-incident cities, signaling that something beyond incident frequency was driving death rates in certain urban centers.\n\n**Census Feature Engineering** — Three derived features were added to the city-level dataset to enrich the correlation analysis:\n\n• **rent_percentage**: proportion of median annual rent cost to median annual income\n• **home_percentage**: proportion of median annual mortgage cost to median annual income\n• **prop_deaths**: proportion of gun violence incidents producing a death\n\n**Correlation Matrices** — Custom correlation matrices were constructed using **ggcorrplot**, isolating features correlated with two distinct targets: incidents per 100K and deaths per 100K.\n\nFor **incidents per 100K**, the strongest signals came from population, deaths per 100K, and the proportion of deaths — essentially tautological relationships. A small signal emerged from gender demographics (lower male proportion correlating with slightly fewer incidents). Critically, **poverty showed near-zero correlation with incident rates**.\n\nFor **deaths per 100K**, a starkly different picture emerged. **Poverty showed moderate positive correlation with death rates**, and the derived cost-of-living scores (rent_percentage, home_percentage) mirrored this as functions of median income and poverty proportion. This divergence between the two correlation profiles became the central analytical thread.\n\n**Plotly Interactive Scatter Plots** — Two interactive scatter plots with custom HTML tooltips (city name, rate value, poverty proportion) and linear regression overlays made the poverty–lethality split visceral. The **incidents vs. poverty** plot showed a nearly flat regression line — poverty has almost no predictive power for whether gun violence occurs. The **deaths vs. poverty** plot showed a steep positive regression line — poverty strongly predicts whether those incidents are lethal. Four cities above 20% poverty threshold drove the relationship, motivating formal hypothesis testing.",
+        },
+        {
+          id: "statistical-inference",
+          title: "STATISTICAL INFERENCE",
+          content:
+            "The visual evidence demanded formal validation. The analysis proceeded through a rigorous three-stage inferential pipeline: parametric testing, non-parametric permutation testing, and bootstrap estimation.\n\n**Hypothesis** — Based on the observed correlation between poverty and death rates, a one-sided hypothesis was formulated:\n\n• H₀: μ_high ≤ μ_low (high-poverty cities have equal or lower death rates)\n• Hₐ: μ_high > μ_low (high-poverty cities have higher death rates)\n\nThe top 15 cities were divided into low and high poverty groups based on the median poverty proportion threshold. High-poverty cities had a mean death rate of 29.9 per 100K; low-poverty cities averaged 11.2 per 100K.\n\n**Assumption Checking** — Before parametric testing, both groups were assessed for normality via the **Shapiro-Wilk test**. Low-poverty cities: W = 0.89, **p = 0.22** (fail to reject normality). High-poverty cities: W = 0.86, **p = 0.16** (fail to reject normality). Both groups passed, though the small sample size (n = 15 total) warranted caution. Variance comparison revealed severe inequality: high-poverty variance = **485.5**, low-poverty variance = **15.8** — a ~30:1 ratio, violating the equal-variance assumption and necessitating Welch's correction.\n\n**Welch's t-test** — With unequal variances, a Welch's t-test was performed: **t = 2.22, df = 6.34, p = 0.033**. The p-value falls below the α = 0.05 threshold, providing statistically significant evidence that high-poverty cities experience higher gun violence death rates. The one-sided confidence interval for the mean difference started at 2.49 deaths per 100K.\n\n**Permutation Test** — To validate the parametric result without distributional assumptions, a **1,000-permutation Monte Carlo test** (seed = 1986) was conducted. In each permutation, the poverty-level labels were shuffled randomly among the 15 cities, and a Welch's t-statistic was computed. The observed t-statistic exceeded the permuted values in all but 11 of 1,000 permutations, yielding **p = 0.011** — stronger than the parametric result. A histogram of the null distribution with the observed t-statistic marked as a dashed vertical line showed it falling well into the rejection region, past the 95th percentile critical value.\n\n**Bootstrap Confidence Interval** — Finally, a **10,000-sample non-parametric bootstrap** estimated the sampling distribution of the median death rate in high-poverty cities. Resampling with replacement from the 7 high-poverty city observations produced a distribution of medians, with the 2.5th and 97.5th percentiles defining a **95% confidence interval of [11.6, 48.0] deaths per 100K**. This wide interval reflects the high variance within the high-poverty group but confirms that even the lower bound substantially exceeds the low-poverty group mean of 11.2.",
+        },
+        {
+          id: "key-findings",
+          title: "KEY FINDINGS",
+          content:
+            "**The Central Finding: Poverty Predicts Lethality, Not Incidence** — This is the most important result of the analysis. Poverty has near-zero correlation with whether gun violence occurs — but it has moderate positive correlation with whether people **die** from it. The scatter plots make the distinction stark: a flat regression line for incidents vs. poverty, a steep positive line for deaths vs. poverty. This finding, validated by three independent statistical tests (Welch's t-test p = 0.033, permutation p = 0.011, bootstrap CI [11.6, 48.0]), reframes how we think about the relationship between socioeconomic conditions and gun violence outcomes.\n\n**The Healthcare Infrastructure Hypothesis** — If poverty doesn't cause more gun violence but does cause more gun violence **deaths**, the mechanism is likely downstream of the incident itself. One plausible explanation: impoverished communities have fewer hospitals, poorer emergency medical infrastructure, and longer emergency response times. A gunshot wound that is survivable in a well-resourced city becomes lethal in a medically underserved one. This hypothesis — that poverty kills through healthcare deprivation rather than through violence generation — has direct policy implications for where to target intervention resources.\n\n**The Gun Ownership Paradox** — Many of the states with the deadliest cities had some of the lowest gun ownership rates in the country. Alaska (64.5% ownership) leads in per-capita incidents, but Delaware (34.4%) and Illinois (27.8%) also rank high despite low ownership. Meanwhile, states with high ownership rates don't necessarily appear in the top incident rankings. This inconsistency suggests that gun ownership rate alone is a poor predictor of gun violence, and that the relationship between access, ownership, and violence is far more nuanced than either side of the policy debate typically acknowledges.\n\n**Per-Capita Normalization Changes Everything** — Raw incident counts are one of the most misleading statistics in gun violence discourse. Illinois appears to have catastrophic gun violence — until you adjust for its 12.7 million population. Alaska and Delaware, rarely mentioned in gun violence conversations, emerge as the most incident-prone states per capita. DC, as a federal district functioning as a single city, is an extreme outlier that distorts any state-level comparison. The lesson: **always normalize by population before drawing conclusions.**\n\n**Personal Reflection** — The author is from **Baltimore, Maryland** — the 2nd deadliest city in the 2017 data. This personal connection adds authentic perspective: the statistics are not abstract. The analysis concludes with a call for more careful research and targeted interventions, arguing that treating gun violence deaths as the output variable (rather than addressing the input conditions — poverty, healthcare access, community infrastructure) perpetuates the cycle rather than breaking it.",
+        },
+      ],
+      keyMetrics: [
+        { label: "INCIDENTS ANALYZED", value: "~239K" },
+        { label: "GEOID RECOVERY", value: "99.8%" },
+        { label: "WELCH'S T-TEST", value: "p = 0.033" },
+        { label: "PERMUTATION TEST", value: "p = 0.011" },
+        { label: "BOOTSTRAP CI", value: "[11.6, 48.0]" },
+        { label: "ST. LOUIS LETHALITY", value: "36%" },
+      ],
+      team: ["Steve Meadows"],
+      course: "STA 418/518 — Intro to Statistics",
+      timeline: "Summer 2024",
+    },
   },
   {
     slug: "order-history-dfa",
     title: "ORDER HISTORY DFA",
-    subtitle: "Time Series Analysis",
+    subtitle: "Multivariate Time Series Dimensionality Reduction",
     category: "stats",
-    tags: ["Time Series", "DFA", "Forecasting", "Pattern Recognition"],
+    tags: [
+      "Time Series",
+      "DFA",
+      "Forecasting",
+      "State-Space Models",
+      "MARSS",
+      "Dimensionality Reduction",
+      "Promax Rotation",
+      "AICc",
+    ],
     description:
-      "Applied Dynamic Factor Analysis to order history time series data, uncovering long-range correlations and scaling behaviors in purchasing patterns.",
+      "Applied Dynamic Factor Analysis via MARSS state-space modeling to reduce 39 multivariate time series variables into 6 interpretable latent trends explaining 55% of variance — then validated with a public dataset showing 11% MAE improvement over raw features.",
     longDescription:
-      "Implemented Dynamic Factor Analysis (DFA) on e-commerce order history data to identify long-range temporal correlations and fractal scaling properties. The analysis revealed hidden patterns in consumer purchasing behavior that traditional time series methods often miss.",
-    techStack: ["Python", "NumPy", "Pandas", "Matplotlib", "SciPy"],
+      "During a data science internship at a durable goods manufacturer, applied Dynamic Factor Analysis (DFA) to a multivariate time series forecasting problem — recognizing that standard PCA/PAF fails on temporal data. Used the MARSS package in R to fit linear dynamical systems via Expectation-Maximization and BFGS optimization, reducing ~39 internal and external economic variables to 6 interpretable latent trends that explained 55% of total variance. Promax oblique rotation yielded factors mapping to real economic constructs (unemployment, commercial real estate, business sentiment, monetary policy, industry demand, professional construction). A companion Kaggle notebook validated the approach on public data, demonstrating 11% lower MAE and 3% lower RMSE when using DFA trends instead of raw features.",
+    techStack: [
+      "R",
+      "MARSS",
+      "psych",
+      "GPArotation",
+      "tseries",
+      "doParallel",
+      "foreach",
+      "ggplot2",
+      "dplyr",
+      "tidyr",
+      "reshape2",
+      "Python",
+      "pandas",
+      "statsforecast",
+      "matplotlib",
+    ],
     image: "/projects/order-dfa.png",
-    github: "https://github.com/steadows",
-    featured: false,
+    github:
+      "https://www.kaggle.com/code/stevemeadows/dfa-performance-comparison",
+    liveDemo:
+      "https://www.kaggle.com/code/stevemeadows/dfa-performance-comparison",
+    featured: true,
+    detail: {
+      sections: [
+        {
+          id: "overview",
+          title: "OVERVIEW",
+          content:
+            "During a data science internship at a durable goods manufacturer, the goal was to build a statistical model forecasting monthly order volume. The model incorporated **~39 time series variables** — a mix of internal pipeline metrics and external economic indicators spanning unemployment, commercial real estate, business sentiment, monetary policy, industry-specific demand, and professional construction indices.\n\nInspired by graduate coursework in multivariate statistics, the initial approach explored applying Principal Component Analysis (PCA) and Principal Axis Factoring (PAF) to reduce the dimensionality of the feature space. However, PCA and PAF assume **static, non-temporal data** — they extract latent factors from a covariance matrix computed across independent observations, which fundamentally breaks down when observations are autocorrelated time series. The extracted components would conflate temporal dynamics with cross-sectional variance, producing misleading and unstable factors.\n\nThe solution was **Dynamic Factor Analysis (DFA)**, a state-space modeling approach designed explicitly for multivariate time series. DFA models the observed data as generated by a smaller set of latent dynamic factors that evolve over time according to a stochastic process — specifically, a linear dynamical system. This allows DFA to capture temporal dependencies while simultaneously reducing dimensionality, yielding interpretable latent trends rather than static components.\n\nImplementation used the **MARSS** (Multivariate Autoregressive State-Space) package in R, which provides robust tools for fitting these models via Expectation-Maximization and BFGS optimization. After careful model selection based on AICc criteria, the analysis settled on **6 latent trends explaining 55% of the variance** across the full variable set, with Promax oblique rotation producing interpretable factors that mapped intuitively to real economic constructs.\n\nDue to the proprietary nature of the internship data, a **companion Kaggle notebook** was created to demonstrate the DFA approach on a public dataset (Bike Sales Data of 100K), validating that the dimensionality reduction produces **equal or better prediction accuracy** with dramatically fewer features.",
+        },
+        {
+          id: "data-preparation",
+          title: "DATA PREPARATION",
+          content:
+            "The dataset comprised **39 time series variables** spanning internal order pipeline metrics and external economic indicators. Preparing this data for MARSS required a rigorous multi-step stationarity pipeline:\n\n**Stationarity Testing** — Each variable was tested using both the **Augmented Dickey-Fuller (ADF)** test (null: unit root present) and the **KPSS** test (null: series is stationary). Using both tests in tandem provided robust classification, flagging variables where ADF p > 0.05 or KPSS p < 0.05 as non-stationary.\n\n**First Differencing** — Non-stationary series were first-differenced to remove trends. After differencing, stationarity was re-tested on all variables.\n\n**Second Differencing** — Variables that remained non-stationary after first differencing received a second round of differencing, with stationarity re-confirmed via ADF and KPSS.\n\n**Variance Thresholding** — After differencing, a variance cutoff (1e-3) was applied to remove near-zero-variance columns that would provide no useful signal to the model.\n\n**Special Handling of the Federal Funds Rate** — The federal funds rate exhibited unique behavior as a level variable managed by policy decisions rather than market forces. Rather than differencing it (which destroyed its interpretive value), it was removed from the differencing pipeline, tested separately for stationarity, and reattached to the processed dataset as a raw level variable aligned to the differenced time indices.\n\n**Redundant Variable Consolidation** — Iterative analysis revealed several groups of highly correlated variables that inflated factor loadings. Return-to-office metropolitan indices were consolidated to a single representative variable, multiple industry stock prices were consolidated, and sparse variables (e.g., infrequent price-change data) were removed entirely.\n\n**Z-Score Standardization** — The MARSS package requires all input series to be z-scored (zero mean, unit variance), ensuring that variables with different scales contribute equally to the factor estimation. The standardized data matrix was then transposed to MARSS's expected format (series in rows, time points in columns).",
+        },
+        {
+          id: "modeling",
+          title: "MODELING",
+          content:
+            "The core of the analysis used the **MARSS state-space framework**, which models the data through two coupled equations:\n\n• **Observation equation:** y(t) = Z·x(t) + a + v(t) — the observed variables y are linear combinations of latent states x, plus offsets a and observation noise v\n• **State equation:** x(t) = B·x(t-1) + u + w(t) — the latent states evolve as a random walk with drift u and process noise w\n\nThe model was configured with **diagonal and unequal** observation and process error covariance matrices (R and Q), zero intercepts (A = \"zero\"), identity state transition (B = \"identity\" for random walk dynamics), and high initial state uncertainty (V0 = diag(10, m)).\n\n**BFGS Optimization** — Model fitting used the BFGS quasi-Newton method with stringent convergence criteria: maximum 10,000 iterations and a relative tolerance of 1e-8. This provided more reliable convergence than the default EM algorithm for models with many parameters.\n\n**Model Selection** — Models were fitted across **m = 1 to 12 latent trends**, with each model's fit evaluated via **AICc** (corrected Akaike Information Criterion), which penalizes model complexity to prevent overfitting. The AICc plot indicated that 3–8 trends represented the optimal range, with diminishing returns beyond 6.\n\n**Iterative Refinement** — The modeling process was iterative rather than single-pass:\n\n• **Initial run** (all variables, m = 1–12): Identified m = 6 as optimal by AICc, but Promax rotation revealed only 38% variance explained with overloaded return-to-office factors\n• **RTO consolidation** (reduced correlated variables): Re-ran m = 4–6, found m = 4 optimal by AICc but showed signs of overfitting in loadings\n• **Final selection** (m = 6 after consolidation): Achieved 55% variance explained with balanced, interpretable factor loadings distributed across three dominant trends\n\n**Parallel Computing** — The `doParallel` and `foreach` packages enabled parallelized model fitting across multiple trend counts, distributing MARSS fits across all available CPU cores to reduce total computation time across the model selection grid.",
+        },
+        {
+          id: "factor-interpretation",
+          title: "FACTOR INTERPRETATION",
+          content:
+            "After fitting the m = 6 model, the raw loadings matrix was rotated to improve interpretability.\n\n**Promax Oblique Rotation** — Unlike Varimax (orthogonal), Promax allows factors to be correlated, which is more realistic for economic time series where underlying forces often co-move. The Promax-rotated loadings matrix was computed using the `psych` and `GPArotation` packages, producing six interpretable trends:\n\n• **Trend 1 — Unemployment dynamics** (6.1% variance): Loaded most heavily on labor market indicators, tracking closely with the unemployment rate\n• **Trend 2 — Commercial real estate activity** (1.0% variance): Captured office leasing and commercial property dynamics\n• **Trend 3 — Business and consumer sentiment** (16.5% variance): The dominant trend, driven by CEO confidence indices and consumer sentiment measures — a \"vibes\" factor capturing the overall economic mood\n• **Trend 4 — Monetary policy** (13.6% variance): Tracked the federal funds rate and interest rate environment, capturing central bank policy impacts on the industry\n• **Trend 5 — Industry-specific demand indicators** (4.4% variance): Loaded on sector-specific demand metrics and trade association indices\n• **Trend 6 — Professional construction activity** (3.1% variance): Captured professional and institutional construction spending, a leading indicator for durable goods demand\n\n**Trend Overlay Validation** — Each Promax-rotated trend was plotted overlaid with its highest-loading observed variable. In every case, the latent trend tracked its corresponding economic indicator closely, providing visual confirmation that the factors captured genuine economic dynamics rather than statistical artifacts.\n\n**Correlation Heatmap** — The correlation matrix of the six Promax-rotated trends was computed and visualized as a heatmap. The trends exhibited **near-independence**, confirming that each factor captured a distinct economic dimension — exactly the desirable property for dimensionality reduction where each trend should represent a different underlying force.",
+        },
+        {
+          id: "prediction-validation",
+          title: "PREDICTION VALIDATION",
+          content:
+            "To demonstrate the practical value of DFA dimensionality reduction without exposing proprietary data, a **companion Kaggle notebook** was created using the publicly available Bike Sales Data of 100K dataset — chosen for its matching monthly time interval and durable goods domain.\n\nThe validation compared two prediction approaches using the **statsforecast** library in Python:\n\n**Setup** — The 6 Promax-rotated DFA trends (extracted from the proprietary analysis) were joined with monthly aggregated bike sales data. The dataset was split into 21 training months and 6 test months, with both DFA trends and raw variables tested as exogenous inputs to the same forecasting models.\n\n**MFLES Model (Multi-Frequency Locally Estimated Scatterplot Smoothing):**\n• Using 6 DFA trends: **MAE = 719,515 | RMSE = 866,562**\n• Using 41 raw variables: **MAE = 798,884 | RMSE = 892,382**\n• **Result: 11% lower MAE and 3% lower RMSE with DFA trends**\n\n**MSTL Model (Multiple Seasonal-Trend decomposition using LOESS):**\n• Using 6 DFA trends: **MAE = 741,814 | RMSE = 819,393**\n• Using 41 raw variables: **MAE = 741,814 | RMSE = 819,393**\n• **Result: Identical performance** — MSTL relies primarily on seasonal decomposition, so exogenous variables had less influence\n\nThe key finding: **6 DFA trends produced equal or better predictions than 41 raw variables**, while offering dramatically simpler inputs. The MFLES model — which more heavily leverages exogenous variables — showed a clear advantage for DFA trends, likely because the latent trends filtered noise from the raw features and captured the underlying economic signal more cleanly.",
+        },
+        {
+          id: "key-takeaways",
+          title: "KEY TAKEAWAYS",
+          content:
+            "**DFA as an underutilized tool** — Dynamic Factor Analysis occupies a unique niche in the data science toolkit: it is specifically designed for the intersection of dimensionality reduction and time series analysis where standard PCA/PAF methods fail. Despite its power, DFA is rarely encountered in applied data science, making it a valuable differentiator.\n\n**The efficiency argument** — Reducing 39 variables to 6 trends means simpler models, faster training, easier interpretability, and lower risk of overfitting. For production forecasting systems where model retraining occurs regularly, this efficiency compounds over time.\n\n**The accuracy argument** — The Kaggle validation demonstrated that latent trends can **outperform raw features** by removing noise and capturing the true underlying economic signal. The 11% MAE improvement with MFLES suggests that DFA trends are not just a compression convenience but can genuinely improve predictive power.\n\n**Practical applicability** — The methodology generalizes to any domain with multivariate time series: finance, healthcare, supply chain, energy, climate science. Any forecasting problem where numerous correlated time series drive an outcome is a candidate for DFA.\n\n**Dual-language pipeline** — The project demonstrated a cross-language data science workflow: R (MARSS, psych, GPArotation) for the statistical modeling where R's ecosystem excels, and Python (pandas, statsforecast, matplotlib) for the prediction comparison where Python's forecasting libraries are stronger. This pragmatic language choice — using each tool where it is strongest — reflects the reality of applied data science work.",
+        },
+      ],
+      keyMetrics: [
+        { label: "INPUT VARIABLES", value: "39" },
+        { label: "LATENT TRENDS", value: "6" },
+        { label: "VARIANCE EXPLAINED", value: "55%" },
+        { label: "MAE IMPROVEMENT", value: "11%" },
+        { label: "RMSE IMPROVEMENT", value: "3%" },
+        { label: "MODELS TESTED", value: "m=1–12" },
+      ],
+      team: ["Steve Meadows"],
+      timeline: "2024–2025",
+    },
   },
   {
     slug: "bjj-adcc-analysis",

@@ -9,7 +9,7 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
 - **Styling:** Tailwind CSS + Shadcn/ui
 - **Animations:** Framer Motion + CSS animations
 - **Hosting:** Vercel
-- **Domain:** Custom domain (e.g., `steadows.dev`) — full URL control
+- **Domain:** `stevemeadows.dev` (Cloudflare) — email routing → `steve@stevemeadows.dev`
 
 ## Design Language
 - **Theme:** Dark base (#0a0a0f), neon accent colors (cyan, electric green, amber)
@@ -37,6 +37,9 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
         [slug]/page.tsx   # Individual project detail
       about/page.tsx      # About / bio
       contact/page.tsx    # Contact form
+      blog/
+        page.tsx          # Blog index
+        [slug]/page.tsx   # Individual blog post
       not-found.tsx       # 404 page
     components/
       ui/                 # Shadcn components
@@ -131,59 +134,91 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
   - 2nd Place — Kaggle Challenge
 - [x] **SVM & Dimensionality Reduction** (Student Achievement) — `svm-dimensionality-reduction`
   - Flesh out detail page content, screenshots/visuals, results narrative
-- [ ] **DinnerBot** (AI Meal Planning) — `dinnerbot`
+- [x] **DinnerBot** (AI Meal Planning) — `dinnerbot`
   - Flesh out detail page content, screenshots/visuals, results narrative
 
 ### 6C: Statistics Projects (Medium Priority)
-- [ ] **Laplace Distribution** (Interactive Explorer) — `laplace-distribution`
+- [x] **Laplace Distribution** (Interactive Explorer) — `laplace-distribution`
   - Flesh out detail page content, screenshots/visuals, results narrative
-- [ ] **Gun Violence Geospatial Analysis** — `gun-violence-geospatial`
+- [x] **Gun Violence Geospatial Analysis** — `gun-violence-geospatial`
   - Flesh out detail page content, screenshots/visuals, results narrative
-- [ ] **STA 631 Statistical Modeling Portfolio** — `sta631-portfolio`
-  - Flesh out detail page content, screenshots/visuals, results narrative
-- [ ] **Order History DFA** (Time Series) — `order-history-dfa`
+- [x] **Order History DFA** (Time Series) — `order-history-dfa`
   - Flesh out detail page content, screenshots/visuals, results narrative
 - [ ] **BJJ ADCC Analysis** (Tableau) — `bjj-adcc-analysis`
-  - Flesh out detail page content, screenshots/visuals, results narrative
-
-### 6D: Database & CS Projects (Lower Priority)
-- [ ] **Database Systems** (Oracle, MongoDB, Redis, Neo4j) — `database-projects`
-  - Flesh out detail page content, screenshots/visuals, results narrative
-- [ ] **CS Fundamentals** (Algorithms & Systems) — `cs-projects`
   - Flesh out detail page content, screenshots/visuals, results narrative
 
 ## Phase 7: About Page
 > GSD Step 7 — Background and experience
 
-- [ ] Professional bio with personality
-- [ ] Timeline of education + experience (vertical timeline component)
-- [ ] Sections that reveal on scroll
-- [ ] Certifications & achievements with badge-style display
-- [ ] Philosophy / approach section
+- [x] Professional bio with personality
+- [x] Timeline of education + experience (vertical timeline component)
+- [x] Sections that reveal on scroll
+- [x] Certifications & achievements with badge-style display
+- [x] Philosophy / approach section
 
 ## Phase 8: Contact Page
 > GSD Step 8 — Get in touch
 
-- [ ] Contact form wired to Supabase (name, email, message)
-- [ ] Clean terminal-inspired form styling
-- [ ] Form validation with Shadcn form components + zod
-- [ ] Success state: "Message sent" confirmation animation
-- [ ] Alternative: social links (GitHub, LinkedIn, email)
+- [x] Contact form wired to Supabase (name, email, message)
+- [x] Clean terminal-inspired form styling (match HUD/dossier aesthetic)
+- [x] Form validation with Shadcn form components + zod
+- [x] Success state: "TRANSMISSION SENT" confirmation animation
+- [x] Social links bar: GitHub, LinkedIn, `steve@stevemeadows.dev`
 - [ ] Optional: Supabase edge function for email notification
 
-## Phase 9: Supabase Integration
-> GSD Step 9 — Backend power
+## Phase 9: Blog
+> GSD Step 9 — Articles, research, and work-in-progress
+
+### 9A: Foundation & Index Page
+- [x] **Blog data structure** (TypeScript): `BlogPost` interface + static data in `src/data/blog.ts`
+  - Fields: slug, title, date, updated, excerpt, tags, category, readTime, featured, status (published/draft)
+  - Categories: Article, Research, Tutorial, Work-in-Progress
+- [x] **Blog index page** (`/blog`):
+  - Page header matching site pattern (section index, GlitchText heading, accent divider, subtitle)
+  - Filterable by category (tabs or pill buttons, consistent with projects page filter UX)
+  - Post cards: title, date, excerpt, tags, estimated read time, category badge
+  - Card hover: border glow + subtle lift (consistent with project cards)
+  - Sort by date (newest first)
+  - SectionReveal scroll animations on card grid
+- [x] **Add "Blog" link to navbar** — between Projects and About
+
+### 9B: Post Detail Page
+- [x] **Blog detail page** (`/blog/[slug]`):
+  - Post header: title (GlitchText), date, read time, category badge, tags
+  - Content rendered from MDX via `next-mdx-remote`
+  - Custom MDX components: styled code blocks, callouts/admonitions, inline images, blockquotes
+  - Typography: readable long-form with Inter body, proper heading hierarchy, link styling
+  - HUDBracket wrapper for content sections where appropriate
+  - "Back to Blog" navigation link
+  - Previous/Next post navigation at bottom
+- [x] **MDX content files** in `src/content/blog/` with frontmatter
+  - Frontmatter parsed to populate the data layer
+  - Rich content support: syntax-highlighted code, embedded components, LaTeX math
+- [x] **Custom MDX components** (`src/components/blog/`):
+  - `CodeBlock.tsx` — Syntax-highlighted code with copy button and language label
+  - `Callout.tsx` — Info/warning/tip admonition boxes styled with accent colors
+  - `BlogImage.tsx` — next/image wrapper with caption and optional HUD frame
+- [x] **`generateStaticParams`** for static generation of all published posts
+
+### 9C: Polish
+- [x] Empty state for filtered categories with no posts
+- [x] Metadata & Open Graph tags per post (dynamic, from frontmatter)
+- [x] Mobile-responsive post layout (readable on all screen sizes)
+- [x] Respect `prefers-reduced-motion` on all animations
+
+## Phase 10: Supabase Integration
+> GSD Step 10 — Backend power
 
 - [ ] Set up Supabase project
 - [ ] Contact form submissions → `messages` table
 - [ ] Optional: page view analytics → `page_views` table
-- [ ] Optional: blog system (future)
+- [ ] Optional: blog migration to Supabase CMS
   - `posts` table with markdown content
   - Dynamic blog routes
 - [ ] Environment variables configuration
 
-## Phase 10: Performance, SEO & Polish
-> GSD Step 10 — Ship it
+## Phase 11: Performance, SEO & Polish
+> GSD Step 11 — Ship it
 
 - [ ] Lighthouse audit — target 90+ on all metrics
 - [ ] Image optimization (next/image, WebP, lazy loading)
@@ -194,8 +229,8 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
 - [ ] 404 page — themed to match site aesthetic
 - [ ] Loading states / skeleton screens
 
-## Phase 11: Deployment
-> GSD Step 11 — Go live
+## Phase 12: Deployment
+> GSD Step 12 — Go live
 
 - [ ] Push to new GitHub repo (e.g., `steadows/portfolio-v2`)
 - [ ] Connect to Vercel
@@ -232,7 +267,7 @@ For Cursor/AI prompting: "cyberpunk dashboard", "military HUD interface", "tacti
 
 ## Hosting
 **Platform:** Vercel (free tier) — native Next.js support, built-in image optimization, edge functions, deploy previews, full SSR/ISR.
-**Domain:** Custom domain (e.g., `steadows.dev` ~$12/yr on Namecheap/Cloudflare) for full URL control.
+**Domain:** `stevemeadows.dev` via Cloudflare (~$12/yr). Email routing: `steve@stevemeadows.dev` → Gmail (free via Cloudflare Email Routing).
 
 ---
 
