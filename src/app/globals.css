@@ -1,26 +1,516 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
+/* ─── Tailwind v4 Theme Tokens ─── */
 @theme inline {
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-heading: var(--font-jetbrains-mono);
+
+  /* Shadcn color bindings */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Custom portfolio colors */
+  --color-bg-base: #0a0a0f;
+  --color-bg-surface: #12121a;
+  --color-bg-elevated: #1a1a2e;
+  --color-accent-cyan: #00f0ff;
+  --color-accent-green: #39ff14;
+  --color-accent-amber: #ffbf00;
+  --color-accent-red: #ff003c;
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #888888;
+  --color-text-muted: #555555;
+
+  /* Radii */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Custom animations */
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-scan-line: scan-line 4s linear infinite;
+  --animate-flicker: flicker 3s infinite;
+  --animate-typing-cursor: typing-cursor 1s step-end infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-profile-scan: profile-scan 6s ease-in-out infinite;
+  --animate-radar-ping: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-scroll-bounce: scroll-bounce 1.6s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ─── Dark Theme (default & only) ─── */
+:root {
+  --radius: 0.5rem;
+  --background: #0a0a0f;
+  --foreground: #e0e0e0;
+  --card: #12121a;
+  --card-foreground: #e0e0e0;
+  --popover: #12121a;
+  --popover-foreground: #e0e0e0;
+  --primary: #00f0ff;
+  --primary-foreground: #0a0a0f;
+  --secondary: #1a1a2e;
+  --secondary-foreground: #e0e0e0;
+  --muted: #1a1a2e;
+  --muted-foreground: #888888;
+  --accent: #1a1a2e;
+  --accent-foreground: #e0e0e0;
+  --destructive: #ff003c;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #00f0ff;
+  --chart-1: #00f0ff;
+  --chart-2: #39ff14;
+  --chart-3: #ffbf00;
+  --chart-4: #ff003c;
+  --chart-5: #8b5cf6;
+  --sidebar: #12121a;
+  --sidebar-foreground: #e0e0e0;
+  --sidebar-primary: #00f0ff;
+  --sidebar-primary-foreground: #0a0a0f;
+  --sidebar-accent: #1a1a2e;
+  --sidebar-accent-foreground: #e0e0e0;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #00f0ff;
+}
+
+/* ─── Base Styles ─── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-bg-base text-text-primary font-sans antialiased;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0f;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1a1a2e;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00f0ff33;
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(0, 240, 255, 0.2);
+    color: #00f0ff;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Keyframes ─── */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  3% { opacity: 0.4; }
+  6% { opacity: 1; }
+  7% { opacity: 0.6; }
+  9% { opacity: 1; }
+  80% { opacity: 1; }
+  83% { opacity: 0.7; }
+  87% { opacity: 1; }
+}
+
+@keyframes typing-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ─── Float Animation (HUD skill badges) ─── */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* ─── Radar Ping (Scroll Indicator) ─── */
+@keyframes radar-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  75%, 100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* ─── Scroll Bounce (Scroll Indicator chevrons) ─── */
+@keyframes scroll-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* ─── Profile Scan Sweep ─── */
+@keyframes profile-scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  25% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* ─── Grid Background ─── */
+@keyframes grid-scroll {
+  0% {
+    transform: perspective(600px) rotateX(55deg) translateY(0);
+  }
+  100% {
+    transform: perspective(600px) rotateX(55deg) translateY(60px);
+  }
+}
+
+.grid-perspective {
+  position: absolute;
+  inset: 0;
+  top: 40%;
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(600px) rotateX(55deg);
+  transform-origin: center top;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 20%, rgba(0,0,0,0.4) 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 20%, rgba(0,0,0,0.4) 60%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .grid-perspective {
+    animation: grid-scroll 4s linear infinite;
+  }
+}
+
+.grid-overlay {
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Glitch Text Effect ─── */
+@keyframes glitch-clip-1 {
+  0%    { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 2px); }
+  10%   { clip-path: inset(50% 0 20% 0); transform: translate(2px, -1px); }
+  20%   { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 3px); }
+  30%   { clip-path: inset(80% 0 5% 0);  transform: translate(3px, 0px); }
+  40%   { clip-path: inset(40% 0 40% 0); transform: translate(-2px, -2px); }
+  50%   { clip-path: inset(60% 0 10% 0); transform: translate(1px, 1px); }
+  60%   { clip-path: inset(5% 0 80% 0);  transform: translate(-3px, 0px); }
+  70%   { clip-path: inset(30% 0 50% 0); transform: translate(2px, 2px); }
+  80%   { clip-path: inset(70% 0 15% 0); transform: translate(0px, -3px); }
+  90%   { clip-path: inset(15% 0 65% 0); transform: translate(-1px, 1px); }
+  100%  { clip-path: inset(45% 0 35% 0); transform: translate(3px, -1px); }
+}
+
+@keyframes glitch-clip-2 {
+  0%    { clip-path: inset(65% 0 10% 0); transform: translate(3px, -2px); }
+  10%   { clip-path: inset(15% 0 70% 0); transform: translate(-2px, 1px); }
+  20%   { clip-path: inset(45% 0 30% 0); transform: translate(1px, -3px); }
+  30%   { clip-path: inset(5% 0 80% 0);  transform: translate(-3px, 0px); }
+  40%   { clip-path: inset(75% 0 10% 0); transform: translate(2px, 2px); }
+  50%   { clip-path: inset(25% 0 55% 0); transform: translate(-1px, -1px); }
+  60%   { clip-path: inset(55% 0 25% 0); transform: translate(3px, 1px); }
+  70%   { clip-path: inset(10% 0 60% 0); transform: translate(0px, 3px); }
+  80%   { clip-path: inset(40% 0 40% 0); transform: translate(-2px, -2px); }
+  90%   { clip-path: inset(70% 0 15% 0); transform: translate(1px, 0px); }
+  100%  { clip-path: inset(30% 0 50% 0); transform: translate(-3px, 2px); }
+}
+
+/* Glitch layers — hidden by default, visible on hover or when continuous */
+.glitch-layer {
+  content: attr(data-text);
+  opacity: 0;
+}
+
+.glitch-layer::before {
+  content: attr(data-text);
+}
+
+.glitch-layer--before {
+  color: #00f0ff;
+  mix-blend-mode: screen;
+}
+
+.glitch-layer--after {
+  color: #ff003c;
+  mix-blend-mode: screen;
+}
+
+/* Continuous glitch */
+.glitch-wrapper[data-continuous] .glitch-layer {
+  opacity: 0.8;
+}
+
+.glitch-wrapper[data-continuous] .glitch-layer--before {
+  animation: glitch-clip-1 2s infinite linear alternate-reverse;
+}
+
+.glitch-wrapper[data-continuous] .glitch-layer--after {
+  animation: glitch-clip-2 2.5s infinite linear alternate-reverse;
+}
+
+/* Hover-triggered glitch */
+.glitch-wrapper:not([data-continuous]):hover .glitch-layer {
+  opacity: 0.8;
+}
+
+.glitch-wrapper:not([data-continuous]):hover .glitch-layer--before {
+  animation: glitch-clip-1 0.4s infinite linear alternate-reverse;
+}
+
+.glitch-wrapper:not([data-continuous]):hover .glitch-layer--after {
+  animation: glitch-clip-2 0.5s infinite linear alternate-reverse;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .glitch-layer {
+    display: none;
+  }
+}
+
+/* ─── Neon Glow Utilities ─── */
+
+/*
+ * Complete glow system with 4 accent colors × 4 types × 2 intensities.
+ * Types: text-glow (text-shadow), box-glow (box-shadow),
+ *        border-glow (border + box-shadow), drop-glow (filter: drop-shadow)
+ * Intensities: default (subtle), -lg (intense)
+ * Colors: cyan, green, amber, red
+ *
+ * Usage:  text-glow-cyan, box-glow-green, border-glow-amber, drop-glow-red
+ *         text-glow-cyan-lg, box-glow-green-lg (intense variants)
+ *         hover:box-glow-cyan (works with Tailwind modifiers via @utility)
+ */
+
+/* ── Text Glow (text-shadow) ── */
+
+@utility text-glow-cyan {
+  text-shadow: 0 0 7px rgba(0, 240, 255, 0.6), 0 0 20px rgba(0, 240, 255, 0.3);
+}
+@utility text-glow-green {
+  text-shadow: 0 0 7px rgba(57, 255, 20, 0.6), 0 0 20px rgba(57, 255, 20, 0.3);
+}
+@utility text-glow-amber {
+  text-shadow: 0 0 7px rgba(255, 191, 0, 0.6), 0 0 20px rgba(255, 191, 0, 0.3);
+}
+@utility text-glow-red {
+  text-shadow: 0 0 7px rgba(255, 0, 60, 0.6), 0 0 20px rgba(255, 0, 60, 0.3);
+}
+
+/* Text Glow — intense */
+@utility text-glow-cyan-lg {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 30px rgba(0, 240, 255, 0.5), 0 0 60px rgba(0, 240, 255, 0.2);
+}
+@utility text-glow-green-lg {
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.8), 0 0 30px rgba(57, 255, 20, 0.5), 0 0 60px rgba(57, 255, 20, 0.2);
+}
+@utility text-glow-amber-lg {
+  text-shadow: 0 0 10px rgba(255, 191, 0, 0.8), 0 0 30px rgba(255, 191, 0, 0.5), 0 0 60px rgba(255, 191, 0, 0.2);
+}
+@utility text-glow-red-lg {
+  text-shadow: 0 0 10px rgba(255, 0, 60, 0.8), 0 0 30px rgba(255, 0, 60, 0.5), 0 0 60px rgba(255, 0, 60, 0.2);
+}
+
+/* ── Box Glow (box-shadow) ── */
+
+@utility box-glow-cyan {
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), 0 0 30px rgba(0, 240, 255, 0.1);
+}
+@utility box-glow-green {
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.3), 0 0 30px rgba(57, 255, 20, 0.1);
+}
+@utility box-glow-amber {
+  box-shadow: 0 0 10px rgba(255, 191, 0, 0.3), 0 0 30px rgba(255, 191, 0, 0.1);
+}
+@utility box-glow-red {
+  box-shadow: 0 0 10px rgba(255, 0, 60, 0.3), 0 0 30px rgba(255, 0, 60, 0.1);
+}
+
+/* Box Glow — intense */
+@utility box-glow-cyan-lg {
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5), 0 0 45px rgba(0, 240, 255, 0.2), 0 0 80px rgba(0, 240, 255, 0.1);
+}
+@utility box-glow-green-lg {
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.5), 0 0 45px rgba(57, 255, 20, 0.2), 0 0 80px rgba(57, 255, 20, 0.1);
+}
+@utility box-glow-amber-lg {
+  box-shadow: 0 0 15px rgba(255, 191, 0, 0.5), 0 0 45px rgba(255, 191, 0, 0.2), 0 0 80px rgba(255, 191, 0, 0.1);
+}
+@utility box-glow-red-lg {
+  box-shadow: 0 0 15px rgba(255, 0, 60, 0.5), 0 0 45px rgba(255, 0, 60, 0.2), 0 0 80px rgba(255, 0, 60, 0.1);
+}
+
+/* ── Border Glow (border-color + box-shadow with inset) ── */
+
+@utility border-glow-cyan {
+  border-color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.05);
+}
+@utility border-glow-green {
+  border-color: #39ff14;
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.3), inset 0 0 10px rgba(57, 255, 20, 0.05);
+}
+@utility border-glow-amber {
+  border-color: #ffbf00;
+  box-shadow: 0 0 10px rgba(255, 191, 0, 0.3), inset 0 0 10px rgba(255, 191, 0, 0.05);
+}
+@utility border-glow-red {
+  border-color: #ff003c;
+  box-shadow: 0 0 10px rgba(255, 0, 60, 0.3), inset 0 0 10px rgba(255, 0, 60, 0.05);
+}
+
+/* Border Glow — intense */
+@utility border-glow-cyan-lg {
+  border-color: #00f0ff;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.1);
+}
+@utility border-glow-green-lg {
+  border-color: #39ff14;
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.5), 0 0 40px rgba(57, 255, 20, 0.15), inset 0 0 15px rgba(57, 255, 20, 0.1);
+}
+@utility border-glow-amber-lg {
+  border-color: #ffbf00;
+  box-shadow: 0 0 15px rgba(255, 191, 0, 0.5), 0 0 40px rgba(255, 191, 0, 0.15), inset 0 0 15px rgba(255, 191, 0, 0.1);
+}
+@utility border-glow-red-lg {
+  border-color: #ff003c;
+  box-shadow: 0 0 15px rgba(255, 0, 60, 0.5), 0 0 40px rgba(255, 0, 60, 0.15), inset 0 0 15px rgba(255, 0, 60, 0.1);
+}
+
+/* ── Drop Glow (filter: drop-shadow — works on non-rectangular elements, icons, SVGs) ── */
+
+@utility drop-glow-cyan {
+  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.5)) drop-shadow(0 0 12px rgba(0, 240, 255, 0.2));
+}
+@utility drop-glow-green {
+  filter: drop-shadow(0 0 4px rgba(57, 255, 20, 0.5)) drop-shadow(0 0 12px rgba(57, 255, 20, 0.2));
+}
+@utility drop-glow-amber {
+  filter: drop-shadow(0 0 4px rgba(255, 191, 0, 0.5)) drop-shadow(0 0 12px rgba(255, 191, 0, 0.2));
+}
+@utility drop-glow-red {
+  filter: drop-shadow(0 0 4px rgba(255, 0, 60, 0.5)) drop-shadow(0 0 12px rgba(255, 0, 60, 0.2));
+}
+
+/* Drop Glow — intense */
+@utility drop-glow-cyan-lg {
+  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 20px rgba(0, 240, 255, 0.35));
+}
+@utility drop-glow-green-lg {
+  filter: drop-shadow(0 0 6px rgba(57, 255, 20, 0.7)) drop-shadow(0 0 20px rgba(57, 255, 20, 0.35));
+}
+@utility drop-glow-amber-lg {
+  filter: drop-shadow(0 0 6px rgba(255, 191, 0, 0.7)) drop-shadow(0 0 20px rgba(255, 191, 0, 0.35));
+}
+@utility drop-glow-red-lg {
+  filter: drop-shadow(0 0 6px rgba(255, 0, 60, 0.7)) drop-shadow(0 0 20px rgba(255, 0, 60, 0.35));
+}
+
+/* ── Custom Cursor ── */
+/* Hide the default cursor when the custom cursor effect is active (desktop only).
+   The .cursor-effect-active class is toggled by the CursorEffect component. */
+.cursor-effect-active,
+.cursor-effect-active * {
+  cursor: none !important;
+}
+
+/* ── Scrollbar Hide (for horizontal-scroll tab bars on mobile) ── */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Glow None (reset — useful for hover:glow-off or responsive breakpoints) ── */
+
+@utility text-glow-none {
+  text-shadow: none;
+}
+@utility box-glow-none {
+  box-shadow: none;
+}
+@utility border-glow-none {
+  border-color: transparent;
+  box-shadow: none;
+}
+@utility drop-glow-none {
+  filter: none;
 }

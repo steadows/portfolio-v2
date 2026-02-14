@@ -1,0 +1,125 @@
+# Project: Steve Meadows — Data Science Portfolio v2
+
+## Overview
+Ultra-modern, techie/militaristic data science portfolio website. Dark theme, neon accents, HUD aesthetics, terminal vibes. Built with Next.js, Supabase, Tailwind CSS, and Shadcn/ui. Hosted on Vercel.
+
+## GSD Protocol
+This project follows the GSD (Get Stuff Done) protocol. Before writing any code:
+
+1. **Read `plan.md`** — It is the single source of truth for what we're building and the current phase.
+2. **Work one phase at a time.** Do not skip ahead or mix phases unless explicitly told to.
+3. **Each phase must produce a working state.** No broken builds at the end of a phase.
+4. **Mark tasks complete in `plan.md`** by changing `- [ ]` to `- [x]` as you finish them.
+5. **If you're unsure, ask.** Don't guess at design decisions or architecture choices.
+
+## Tech Stack (Do Not Deviate)
+- **Framework:** Next.js 14+ (App Router, NOT Pages Router)
+- **Language:** TypeScript (strict mode)
+- **Styling:** Tailwind CSS v4 + Shadcn/ui
+- **Animations:** Framer Motion + CSS animations
+- **Database:** Supabase
+- **Hosting:** Vercel
+- **Fonts:** JetBrains Mono (headings/code) + Inter (body) via `next/font`
+
+## Code Standards
+
+### General
+- TypeScript strict mode — no `any` types unless absolutely unavoidable
+- Use `const` by default, `let` only when reassignment is needed
+- Prefer named exports over default exports
+- Keep files focused — one component per file
+- Use absolute imports via `@/` path alias
+
+### React / Next.js
+- Use Server Components by default; only add `"use client"` when you need interactivity, hooks, or browser APIs
+- Use the App Router file conventions: `layout.tsx`, `page.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`
+- Use `next/image` for all images — never raw `<img>` tags
+- Use `next/link` for all internal navigation — never raw `<a>` tags for internal routes
+- Use `next/font` for font loading — no external CDN font links
+- Colocate components with the routes that use them when they're single-use; shared components go in `src/components/`
+
+### Tailwind CSS
+- Use Tailwind utility classes directly — avoid `@apply` except in global base styles
+- Use CSS variables for theme tokens (colors, glows) defined in `globals.css`
+- Use `cn()` helper (from `lib/utils.ts`) for conditional class merging
+- Respect `prefers-reduced-motion` — wrap intense animations in `motion-safe:` variants
+
+### Shadcn/ui
+- Install components via CLI (`npx shadcn-ui@latest add <component>`)
+- Components live in `src/components/ui/` — do not modify them unless necessary
+- Extend Shadcn components by wrapping them, not editing the source
+
+### File Naming
+- Components: `PascalCase.tsx` (e.g., `HeroSection.tsx`, `GlitchText.tsx`)
+- Utilities/hooks: `camelCase.ts` (e.g., `useScrollProgress.ts`, `cn.ts`)
+- Data files: `camelCase.ts` (e.g., `projects.ts`, `skills.ts`)
+- CSS files: `kebab-case.css` (e.g., `scan-lines.css`)
+
+## Project Structure
+```
+src/
+  app/                    # Next.js App Router pages
+    layout.tsx
+    page.tsx
+    projects/
+      page.tsx
+      [slug]/page.tsx
+    about/page.tsx
+    contact/page.tsx
+    not-found.tsx
+  components/
+    ui/                   # Shadcn/ui components (do not modify)
+    layout/               # Navbar, Footer, PageWrapper
+    sections/             # Hero, Skills, ProjectsGrid, etc.
+    effects/              # Particles, ScanLines, GlitchText, TypeWriter, HUDBracket
+  lib/                    # Utilities, Supabase client, helpers
+  data/                   # Static data (projects, skills, nav items)
+  styles/                 # Global CSS, animation keyframes
+```
+
+## Design System
+
+### Colors (CSS Variables)
+- `--bg-base`: #0a0a0f (near-black)
+- `--bg-surface`: #12121a (card/surface)
+- `--bg-elevated`: #1a1a2e (elevated elements)
+- `--accent-cyan`: #00f0ff (primary accent)
+- `--accent-green`: #39ff14 (secondary accent / success)
+- `--accent-amber`: #ffbf00 (warning / highlight)
+- `--accent-red`: #ff003c (error / alert)
+- `--text-primary`: #e0e0e0
+- `--text-secondary`: #888888
+- `--text-muted`: #555555
+
+### Glow Effects
+Use `drop-shadow` and `box-shadow` with accent colors for neon glow effects. Define reusable Tailwind utilities for these.
+
+### Spacing & Layout
+- Max content width: 1200px centered
+- Section padding: `py-20 md:py-32`
+- Consistent spacing scale via Tailwind defaults
+
+## Design Personality
+- **DO:** Dark, tactical, futuristic, clean, high-contrast, purposeful animations
+- **DON'T:** Cluttered, cartoonish, pastel, over-animated to the point of distraction
+- Think: military command center + cyberpunk terminal + clean modern portfolio
+- Every visual effect should serve a purpose — atmosphere, hierarchy, or feedback
+- Animations should feel snappy and intentional, not floaty or slow
+
+## Performance Rules
+- Lighthouse target: 90+ on all metrics
+- Lazy load below-the-fold content
+- Use `next/image` with proper `width`/`height` or `fill` — no layout shift
+- Keep client-side JS minimal — Server Components first
+- No massive dependencies for small features (don't import all of D3 for one chart)
+
+## Git Conventions
+- Branch per phase: `phase-1/scaffolding`, `phase-2/visual-system`, etc.
+- Commit messages: concise, imperative mood (e.g., "Add glitch text component", "Wire up navbar links")
+- Commit working states — don't commit broken code
+
+## When In Doubt
+1. Check `plan.md` for the current phase and task list
+2. Keep it simple — don't over-engineer
+3. Ship working code, then iterate
+4. Ask before making architectural decisions not covered in the plan

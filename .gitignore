@@ -24,6 +24,23 @@
 .DS_Store
 *.pem
 
+# AI agent / IDE config
+.agent/
+.agents/
+.claude/
+.cursor/
+.vscode/
+
+# Reference materials (not part of the website)
+reference/
+
+# Conda environment
+environment.yml
+
+# Generated image prompts & temp images in root
+image-prompts.md
+/bjj-adcc.png
+
 # debug
 npm-debug.log*
 yarn-debug.log*
