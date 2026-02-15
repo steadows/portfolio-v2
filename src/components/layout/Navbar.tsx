@@ -130,7 +130,7 @@ export function Navbar() {
         >
           {/* Logo */}
           <Image
-            src="/logo.png"
+            src="/logo.jpg"
             alt="Steve Meadows"
             width={36}
             height={36}
