@@ -220,21 +220,22 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
 ## Phase 11: Performance, SEO & Polish
 > GSD Step 11 — Ship it
 
+- [ ] **Mobile Polish:** Fix specific sizing issues (ensure perfect adaptation to phone screens)
+- [ ] **Favicon System:** Create and add browser tab icon (`icon.png`, `apple-icon.png`)
+- [ ] **Link Previews (Open Graph):** Configure social share previews (image, title, description) for texts/socials
 - [ ] Lighthouse audit — target 90+ on all metrics
 - [ ] Image optimization (next/image, WebP, lazy loading)
-- [ ] Metadata & Open Graph tags for every page
 - [ ] `robots.txt` + `sitemap.xml` generation
 - [ ] Reduce motion media query (respect `prefers-reduced-motion`)
-- [ ] Favicon + PWA manifest
 - [ ] 404 page — themed to match site aesthetic
 - [ ] Loading states / skeleton screens
 
 ## Phase 12: Deployment
 > GSD Step 12 — Go live
 
-- [ ] Push to new GitHub repo (e.g., `steadows/portfolio-v2`)
-- [ ] Connect to Vercel
-- [ ] Configure custom domain (if purchased)
+- [x] Push to new GitHub repo (e.g., `steadows/portfolio-v2`)
+- [x] Connect to Vercel
+- [x] Configure custom domain (if purchased)
 - [ ] Set environment variables (Supabase keys)
 - [ ] Configure redirects from old GitHub Pages if needed
 - [ ] Test production build
@@ -252,11 +253,8 @@ Port these projects from the current site:
 | Cross-Modal VAE (Biological Prediction) — 2nd Place | ML | High |
 | Wine AI (Transformer Tasting Notes) — 2nd Place | ML | High |
 | Gun Violence Geospatial Analysis | Stats | Medium |
-| STA 631 Statistical Modeling Portfolio | Stats | Medium |
 | Order History DFA (Time Series) | Stats | Medium |
 | BJJ ADCC Analysis (Tableau) | Stats | Medium |
-| Database Projects (Oracle, MongoDB, Redis, Neo4j) | Database | Medium |
-| CS Projects (Algorithms, Multithreading, Mobile) | CS | Low |
 
 ---
 

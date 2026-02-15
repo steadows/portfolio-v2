@@ -161,17 +161,6 @@ export function HeroSection() {
         animate="visible"
         className="relative z-10 flex max-w-2xl flex-col items-center gap-5 px-4 text-center"
       >
-        {/* Status indicator */}
-        <motion.div
-          variants={itemVariants}
-          className="flex items-center gap-2"
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-accent-green motion-safe:animate-glow-pulse" />
-          <p className="font-heading text-[11px] tracking-[0.3em] text-accent-cyan/80">
-            AVAILABLE FOR WORK
-          </p>
-        </motion.div>
-
         {/* Decorative divider */}
         <motion.div
           variants={itemVariants}

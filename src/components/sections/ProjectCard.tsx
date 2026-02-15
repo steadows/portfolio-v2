@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { LuExternalLink, LuGithub, LuAward } from "react-icons/lu";
 import type { Project } from "@/data/projects";
@@ -130,19 +131,14 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       {/* ── Project Image / Preview Area ── */}
       <div className="relative h-44 overflow-hidden bg-bg-base/60">
-        {/* Placeholder grid pattern (until real images are added) */}
-        <div className="absolute inset-0 opacity-30">
-          <div
-            className="h-full w-full"
-            style={{
-              backgroundImage: `
-                linear-gradient(to right, ${colors.scanColor} 1px, transparent 1px),
-                linear-gradient(to bottom, ${colors.scanColor} 1px, transparent 1px)
-              `,
-              backgroundSize: "20px 20px",
-            }}
-          />
-        </div>
+        <Image
+          src={project.image}
+          alt={`${project.title} — ${project.subtitle}`}
+          fill
+          sizes="(max-width: 768px) 100vw, 400px"
+          className="object-cover"
+          priority={project.featured}
+        />
 
         {/* Project category label */}
         <div className="absolute top-3 left-3 z-20">
