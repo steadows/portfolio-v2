@@ -9,7 +9,7 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
 - **Styling:** Tailwind CSS + Shadcn/ui
 - **Animations:** Framer Motion + CSS animations
 - **Hosting:** Vercel
-- **Domain:** `stevemeadows.dev` (Cloudflare) — email routing → `steve@stevemeadows.dev`
+- **Domain:** `steve-meadows.com` (Cloudflare) — email routing → `steve@steve-meadows.com`
 
 ## Design Language
 - **Theme:** Dark base (#0a0a0f), neon accent colors (cyan, electric green, amber)
@@ -267,7 +267,7 @@ For Cursor/AI prompting: "cyberpunk dashboard", "military HUD interface", "tacti
 
 ## Hosting
 **Platform:** Vercel (free tier) — native Next.js support, built-in image optimization, edge functions, deploy previews, full SSR/ISR.
-**Domain:** `stevemeadows.dev` via Cloudflare (~$12/yr). Email routing: `steve@stevemeadows.dev` → Gmail (free via Cloudflare Email Routing).
+**Domain:** `steve-meadows.com` via Cloudflare. Email routing: `steve@steve-meadows.com` → Gmail (free via Cloudflare Email Routing).
 
 ---
 

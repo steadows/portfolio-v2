@@ -25,7 +25,7 @@ export const socialLinks: SocialLink[] = [
   },
   {
     label: "LinkedIn",
-    href: "https://linkedin.com/in/stevemeadows",
+    href: "https://linkedin.com/in/steadows",
     icon: "linkedin",
   },
 ];

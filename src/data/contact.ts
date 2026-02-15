@@ -29,8 +29,8 @@ export const socialLinks: SocialLink[] = [
   },
   {
     id: "email",
-    label: "steve@stevemeadows.dev",
-    href: "mailto:steve@stevemeadows.dev",
+    label: "steve@steve-meadows.com",
+    href: "mailto:steve@steve-meadows.com",
     icon: "mail",
     accentColor: "green",
   },
