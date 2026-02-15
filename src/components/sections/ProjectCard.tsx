@@ -131,14 +131,16 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       {/* ── Project Image / Preview Area ── */}
       <div className="relative h-44 overflow-hidden bg-bg-base/60">
-        <Image
-          src={project.image}
-          alt={`${project.title} — ${project.subtitle}`}
-          fill
-          sizes="(max-width: 768px) 100vw, 400px"
-          className="object-cover"
-          priority={project.featured}
-        />
+        <div className="absolute inset-x-0 top-9 bottom-0 px-2">
+          <Image
+            src={project.image}
+            alt={`${project.title} — ${project.subtitle}`}
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            className="object-contain"
+            priority={project.featured}
+          />
+        </div>
 
         {/* Project category label */}
         <div className="absolute top-3 left-3 z-20">
