@@ -170,7 +170,7 @@ export function HeroSection() {
 
         {/* Profile image with HUD frame + scan effect */}
         <motion.div variants={profileItemVariants} className="pb-1">
-          <ProfileImage size={160} />
+          <ProfileImage src="/images/profile.png" size={160} />
         </motion.div>
 
         {/* Main name — GlitchText with continuous effect */}

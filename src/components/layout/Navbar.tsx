@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   motion,
@@ -127,14 +128,14 @@ export function Navbar() {
           className="group flex items-center gap-2 font-heading text-sm tracking-[0.2em] text-text-primary transition-colors hover:text-accent-cyan"
           onClick={closeMobile}
         >
-          {/* Status light */}
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-green opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-green" />
-          </span>
-          <span className="transition-all group-hover:text-glow-cyan">
-            SM
-          </span>
+          {/* Logo */}
+          <Image
+            src="/logo.png"
+            alt="Steve Meadows"
+            width={36}
+            height={36}
+            className="transition-all group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]"
+          />
           <span className="hidden text-text-muted sm:inline">
             //
           </span>
