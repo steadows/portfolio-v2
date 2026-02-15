@@ -176,23 +176,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
         {/* Gradient overlay at bottom of image area */}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-bg-surface/90 to-transparent" />
 
-        {/* Decorative HUD corners */}
-        <div
-          className={cn(
-            "pointer-events-none absolute bottom-2 left-2 h-3 w-3 border-b border-l",
-            colors.border,
-            "opacity-40 transition-opacity group-hover:opacity-80"
-          )}
-          aria-hidden="true"
-        />
-        <div
-          className={cn(
-            "pointer-events-none absolute bottom-2 right-2 h-3 w-3 border-b border-r",
-            colors.border,
-            "opacity-40 transition-opacity group-hover:opacity-80"
-          )}
-          aria-hidden="true"
-        />
       </div>
 
       {/* ── Content Area ── */}
