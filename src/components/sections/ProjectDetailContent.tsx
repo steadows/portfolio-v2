@@ -636,7 +636,7 @@ export function ProjectDetailContent({
               }}
             >
               <LuExternalLink className="h-4 w-4" aria-hidden="true" />
-              View Notebook
+              {project.liveDemoLabel ?? "View Notebook"}
             </a>
           )}
           {project.github && (

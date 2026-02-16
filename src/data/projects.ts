@@ -57,6 +57,8 @@ export interface Project {
   image: string;
   github?: string;
   liveDemo?: string;
+  /** Label for the liveDemo button (defaults to "View Notebook") */
+  liveDemoLabel?: string;
   achievement?: string;
   featured: boolean;
   /** Rich detail content for the project detail page (populated per-project) */
@@ -864,7 +866,9 @@ export const projects: Project[] = [
       "Built a multi-view interactive Tableau dashboard analyzing the Abu Dhabi Combat Club (ADCC) submission grappling tournaments — the pinnacle of competitive Brazilian Jiu Jitsu. Using two publicly available Kaggle datasets (historical match data and fighter statistics), the project identifies the most effective submissions across weight classes, tracks the rise of leg locks over time via regression analysis, and explores performance patterns through filterable visualizations. Key finding: a small handful of submissions dominate competition victories, and fighters with narrower submission repertoires tend to outperform those with broader ones — specialization beats versatility at the highest level.",
     techStack: ["Tableau", "Python", "Pandas", "Excel"],
     image: "/projects/bjj-adcc.png",
-    liveDemo: "https://public.tableau.com",
+    liveDemo:
+      "https://public.tableau.com/app/profile/anthony.meadows/viz/241110_final_project_submissions_dashboard_BACKUP/Dashboard1",
+    liveDemoLabel: "View on Tableau Public",
     featured: false,
     detail: {
       sections: [
@@ -934,7 +938,7 @@ export const projects: Project[] = [
         },
       ],
       team: ["Steve Meadows"],
-      course: "STA 518 — Data Visualization",
+      course: "STA 671 — Data Visualization",
       timeline: "Fall 2024",
     },
   },
