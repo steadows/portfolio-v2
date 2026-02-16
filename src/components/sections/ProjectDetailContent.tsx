@@ -156,12 +156,40 @@ function renderRichText(content: string, accent: AccentColor) {
   });
 }
 
-/** Simple inline formatting: **bold** */
+/** Inline formatting: **bold**, `code`, and HTML-safe output */
 function formatInlineText(text: string): string {
-  return text.replace(
+  // 1. Extract backtick code spans to protect them from escaping
+  const codeSpans: string[] = [];
+  let withPlaceholders = text.replace(/`([^`]+)`/g, (_, code) => {
+    codeSpans.push(code);
+    return `__CODE_SPAN_${codeSpans.length - 1}__`;
+  });
+
+  // 2. HTML-escape the rest so angle brackets render as text
+  withPlaceholders = withPlaceholders
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // 3. Bold markers → <strong>
+  withPlaceholders = withPlaceholders.replace(
     /\*\*(.+?)\*\*/g,
     '<strong class="text-text-primary font-medium">$1</strong>'
   );
+
+  // 4. Restore code spans as styled <code> elements (escape their contents too)
+  withPlaceholders = withPlaceholders.replace(
+    /__CODE_SPAN_(\d+)__/g,
+    (_, idx) => {
+      const escaped = codeSpans[Number(idx)]
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      return `<code class="rounded bg-bg-elevated px-1.5 py-0.5 font-heading text-xs text-accent-cyan">${escaped}</code>`;
+    }
+  );
+
+  return withPlaceholders;
 }
 
 // ─── Embed Tabs ─────────────────────────────────────────────────────────────

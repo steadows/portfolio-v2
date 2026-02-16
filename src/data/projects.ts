@@ -182,7 +182,7 @@ export const projects: Project[] = [
       ],
       team: ["Steve Meadows", "Lauryn Davis", "Brooke Walters"],
       course: "CIS 678 — Machine Learning",
-      timeline: "Fall 2024",
+      timeline: "Winter 2025",
     },
   },
   {
@@ -256,7 +256,7 @@ export const projects: Project[] = [
       ],
       team: ["Steve Meadows", "Lauryn Davis", "Brooke Walters"],
       course: "CIS 678 — Machine Learning",
-      timeline: "Fall 2024",
+      timeline: "Winter 2025",
     },
   },
   {
@@ -509,8 +509,7 @@ export const projects: Project[] = [
         { label: "CLASS WEIGHT RATIO", value: "6.6:1" },
       ],
       team: ["Steve Meadows"],
-      course: "CIS 678 — Machine Learning",
-      timeline: "Fall 2024",
+      timeline: "Fall 2025",
     },
   },
 
@@ -565,7 +564,7 @@ export const projects: Project[] = [
           id: "conversational-ai",
           title: "CONVERSATIONAL AI",
           content:
-            "The conversational AI layer is what makes DinnerBot feel like an actual chef rather than a command-line tool. At its core is the **RISEN (Role, Instructions, Steps, End goal, Narrowing)** prompting framework — every prompt sent to Gemini is structured with XML tags (<role>, <instructions>, <steps>, <end_goal>, <narrowing>) that separate instructions from dynamic data, producing consistent, high-quality outputs.\n\n**Context Assembly** — Each conversational response draws from five context sources injected into the prompt via dedicated XML sections: <family_profile> (dietary constraints, equipment, preferences), <meal_history> (last 5 meals with timestamps, selection counts, favorite status), <conversation_history> (last 10 messages with metadata-enriched descriptions), <pending_meals> (current menu options if active), and optional <staleness> and <pending_feedback> tags that shape the conversational tone.\n\n**Metadata Enrichment** — Raw conversation logs are transformed into semantically rich context before being injected into prompts. A user message of \"2\" becomes \"User selected Butter Chicken.\" A message of \"favorites\" becomes \"User asked to see their favorites.\" This enrichment layer ensures Gemini understands the conversational arc rather than seeing a stream of cryptic numbers and keywords.\n\n**Memory Systems** — The bot maintains two forms of memory: short-term conversation history (last 10 messages with metadata) and long-term meal history (every selection, with timestamps, frequency counts, and feedback). Meals selected three or more times are automatically flagged as favorites. This enables Gordon to naturally reference past meals — \"You loved that Butter Chicken last week\" or \"We haven't done beef in a while.\"\n\n**Staleness Detection** — When more than 24 hours pass between interactions, a <staleness> context tag is injected, prompting Gordon to acknowledge the gap naturally (\"Welcome back!\" or \"Right, where were we?\") rather than continuing as if the conversation never stopped.\n\n**Feedback Loop** — After sending a grocery list, the system sets a pending_feedback flag. On the next interaction, a <pending_feedback> tag prompts Gordon to ask how the meal turned out. Feedback (\"loved it\", \"it was okay\", \"skip next time\") is parsed via sentiment extraction and stored against the meal history entry, building a preference profile over time.",
+            "The conversational AI layer is what makes DinnerBot feel like an actual chef rather than a command-line tool. At its core is the **RISEN (Role, Instructions, Steps, End goal, Narrowing)** prompting framework — every prompt sent to Gemini is structured with XML tags (`<role>`, `<instructions>`, `<steps>`, `<end_goal>`, `<narrowing>`) that separate instructions from dynamic data, producing consistent, high-quality outputs.\n\n**Context Assembly** — Each conversational response draws from five context sources injected into the prompt via dedicated XML sections: `<family_profile>` (dietary constraints, equipment, preferences), `<meal_history>` (last 5 meals with timestamps, selection counts, favorite status), `<conversation_history>` (last 10 messages with metadata-enriched descriptions), `<pending_meals>` (current menu options if active), and optional `<staleness>` and `<pending_feedback>` tags that shape the conversational tone.\n\n**Metadata Enrichment** — Raw conversation logs are transformed into semantically rich context before being injected into prompts. A user message of \"2\" becomes \"User selected Butter Chicken.\" A message of \"favorites\" becomes \"User asked to see their favorites.\" This enrichment layer ensures Gemini understands the conversational arc rather than seeing a stream of cryptic numbers and keywords.\n\n**Memory Systems** — The bot maintains two forms of memory: short-term conversation history (last 10 messages with metadata) and long-term meal history (every selection, with timestamps, frequency counts, and feedback). Meals selected three or more times are automatically flagged as favorites. This enables Gordon to naturally reference past meals — \"You loved that Butter Chicken last week\" or \"We haven't done beef in a while.\"\n\n**Staleness Detection** — When more than 24 hours pass between interactions, a `<staleness>` context tag is injected, prompting Gordon to acknowledge the gap naturally (\"Welcome back!\" or \"Right, where were we?\") rather than continuing as if the conversation never stopped.\n\n**Feedback Loop** — After sending a grocery list, the system sets a pending_feedback flag. On the next interaction, a `<pending_feedback>` tag prompts Gordon to ask how the meal turned out. Feedback (\"loved it\", \"it was okay\", \"skip next time\") is parsed via sentiment extraction and stored against the meal history entry, building a preference profile over time.",
         },
         {
           id: "features",
@@ -662,8 +661,8 @@ export const projects: Project[] = [
         { label: "SLIDER THROTTLE", value: "40ms" },
       ],
       team: ["Steve Meadows"],
-      course: "STA 532 — Applied Statistics",
-      timeline: "Fall 2024",
+      course: "STA 632 — Statistical Modeling II",
+      timeline: "Winter 2026",
     },
   },
   {
@@ -751,7 +750,7 @@ export const projects: Project[] = [
         { label: "ST. LOUIS LETHALITY", value: "36%" },
       ],
       team: ["Steve Meadows"],
-      course: "STA 418/518 — Intro to Statistics",
+      course: "STA 518 — Statistical Computing",
       timeline: "Summer 2024",
     },
   },
