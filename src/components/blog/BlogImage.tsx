@@ -30,6 +30,7 @@ export function BlogImage({
           alt={alt}
           width={width}
           height={height}
+          loading="lazy"
           className="h-auto w-full"
         />
       </div>

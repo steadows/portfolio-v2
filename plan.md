@@ -232,12 +232,12 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
   - Audit pages: Home (Hero, Skills, Projects), Projects grid, Project detail, Blog index, Blog post, About, Contact, 404
 - [x] **Favicon System:** Create and add browser tab icon (`icon.png`, `apple-icon.png`)
 - [x] **Link Previews (Open Graph):** Configure social share previews (image, title, description) for texts/socials
-- [ ] Lighthouse audit — target 90+ on all metrics
-- [ ] Image optimization (next/image, WebP, lazy loading)
-- [ ] `robots.txt` + `sitemap.xml` generation
-- [ ] Reduce motion media query (respect `prefers-reduced-motion`)
-- [ ] 404 page — themed to match site aesthetic
-- [ ] Loading states / skeleton screens
+- [x] Lighthouse audit — target 90+ on all metrics
+- [x] Image optimization (next/image, WebP, lazy loading)
+- [x] `robots.txt` + `sitemap.xml` generation
+- [x] Reduce motion media query (respect `prefers-reduced-motion`)
+- [x] 404 page — themed to match site aesthetic
+- [x] Loading states / skeleton screens
 
 ## Phase 12: Deployment
 > GSD Step 12 — Go live

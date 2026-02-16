@@ -135,6 +135,7 @@ export function Navbar() {
               alt="Steve Meadows"
               width={36}
               height={36}
+              priority
               className="transition-all group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]"
             />
             <span className="hidden text-text-muted sm:inline">
