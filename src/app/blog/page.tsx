@@ -5,6 +5,9 @@ import { BlogFilters } from "@/components/sections/BlogFilters";
 import { SectionReveal } from "@/components/effects/SectionReveal";
 import { GlitchText } from "@/components/effects/GlitchText";
 
+// Force server-side render on every request (avoids stale cache in dev/prod)
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Blog",
   description:

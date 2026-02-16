@@ -196,7 +196,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       </SectionReveal>
 
       {/* ── MDX Content ── */}
-      <SectionReveal animation="fadeUp" delay={0.2}>
+      <SectionReveal animation="fadeUp" delay={0.2} threshold={0.01}>
         <HUDBracket
           label="CONTENT"
           status="READING"
@@ -208,7 +208,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       </SectionReveal>
 
       {/* ── Previous / Next Navigation ── */}
-      <SectionReveal animation="fadeUp" delay={0.1}>
+      <SectionReveal animation="fadeUp" delay={0.1} threshold={0.01}>
         <nav
           className="mt-16 grid grid-cols-1 gap-4 border-t border-white/5 pt-8 sm:grid-cols-2"
           aria-label="Blog post navigation"
