@@ -140,7 +140,7 @@ export function HeroSection() {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <section className="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-x-clip">
+    <section className="relative flex w-full min-h-[calc(100svh-4rem)] flex-col overflow-x-clip">
       {/* ── Decorative HUD corner markers ── */}
       <div
         className="pointer-events-none absolute inset-0 hidden sm:block"

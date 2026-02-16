@@ -8,7 +8,7 @@ export default function HomePage() {
       <HeroSection />
 
       {/* ── Skills & Tools Section ── */}
-      <div id="content">
+      <div id="content" className="flex w-full flex-col items-center">
         <TechArsenalSection />
       </div>
     </main>
