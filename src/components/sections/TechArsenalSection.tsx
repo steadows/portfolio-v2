@@ -241,12 +241,7 @@ export function TechArsenalSection() {
       <SectionReveal animation="fadeUp" delay={0.2}>
         <LayoutGroup>
           <div
-            className={cn(
-              "relative mt-12 flex gap-2 overflow-x-auto pb-2",
-              "sm:grid sm:grid-cols-5 sm:gap-3 sm:overflow-visible sm:pb-0",
-              "scrollbar-hide",
-              "[mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] sm:[mask-image:none]"
-            )}
+            className="mt-12 grid grid-cols-2 gap-2 sm:grid-cols-5 sm:gap-3"
             role="tablist"
             aria-label="Skill categories"
           >
@@ -263,9 +258,9 @@ export function TechArsenalSection() {
                   aria-controls={`tabpanel-${category.id}`}
                   id={`tab-${category.id}`}
                   className={cn(
-                    "relative min-w-[110px] flex-shrink-0 cursor-pointer border p-2.5 text-left transition-colors",
+                    "relative cursor-pointer border p-2.5 text-left transition-colors",
                     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-cyan/50",
-                    "sm:min-w-0 sm:p-3",
+                    "sm:p-3",
                     isActive
                       ? cn(colors.borderActive, "bg-bg-surface/80")
                       : cn(
