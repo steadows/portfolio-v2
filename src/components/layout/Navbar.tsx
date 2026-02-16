@@ -113,115 +113,117 @@ export function Navbar() {
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled
-          ? "border-b border-accent-cyan/10 bg-bg-base/80 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent"
-      )}
-    >
-      <nav className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-        {/* ── Logo / Name ── */}
-        <Link
-          href="/"
-          className="group flex items-center gap-2 font-heading text-sm tracking-[0.2em] text-text-primary transition-colors hover:text-accent-cyan"
-          onClick={closeMobile}
-        >
-          {/* Logo */}
-          <Image
-            src="/logo.jpg"
-            alt="Steve Meadows"
-            width={36}
-            height={36}
-            className="transition-all group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]"
-          />
-          <span className="hidden text-text-muted sm:inline">
-            //
-          </span>
-          <span className="hidden text-text-secondary sm:inline">
-            PORTFOLIO
-          </span>
-        </Link>
+    <>
+      <header
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          scrolled
+            ? "border-b border-accent-cyan/10 bg-bg-base/80 backdrop-blur-md"
+            : "border-b border-transparent bg-transparent"
+        )}
+      >
+        <nav className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
+          {/* ── Logo / Name ── */}
+          <Link
+            href="/"
+            className="group flex items-center gap-2 font-heading text-sm tracking-[0.2em] text-text-primary transition-colors hover:text-accent-cyan"
+            onClick={closeMobile}
+          >
+            {/* Logo */}
+            <Image
+              src="/logo.jpg"
+              alt="Steve Meadows"
+              width={36}
+              height={36}
+              className="transition-all group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]"
+            />
+            <span className="hidden text-text-muted sm:inline">
+              //
+            </span>
+            <span className="hidden text-text-secondary sm:inline">
+              PORTFOLIO
+            </span>
+          </Link>
 
-        {/* ── Desktop Navigation ── */}
-        <ul className="hidden items-center gap-1 md:flex">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "relative flex items-center gap-2 px-4 py-2 font-heading text-xs tracking-[0.15em] transition-colors",
-                    isActive
-                      ? "text-accent-cyan"
-                      : "text-text-secondary hover:text-text-primary"
-                  )}
-                >
-                  {/* Status dot — active indicator */}
-                  <span
+          {/* ── Desktop Navigation ── */}
+          <ul className="hidden items-center gap-1 md:flex">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
                     className={cn(
-                      "h-1 w-1 rounded-full transition-all duration-300",
+                      "relative flex items-center gap-2 px-4 py-2 font-heading text-xs tracking-[0.15em] transition-colors",
                       isActive
-                        ? "bg-accent-cyan shadow-[0_0_6px_rgba(0,240,255,0.8)]"
-                        : "bg-text-muted"
+                        ? "text-accent-cyan"
+                        : "text-text-secondary hover:text-text-primary"
                     )}
-                  />
-                  {item.label}
-
-                  {/* Animated underline — shared layoutId for sliding effect */}
-                  {isActive && (
-                    <motion.span
-                      layoutId="navbar-underline"
-                      className="absolute bottom-0 left-4 right-4 h-px bg-accent-cyan shadow-[0_0_8px_rgba(0,240,255,0.6)]"
-                      transition={
-                        shouldReduceMotion
-                          ? { duration: 0 }
-                          : {
-                              type: "spring",
-                              stiffness: 400,
-                              damping: 30,
-                            }
-                      }
+                  >
+                    {/* Status dot — active indicator */}
+                    <span
+                      className={cn(
+                        "h-1 w-1 rounded-full transition-all duration-300",
+                        isActive
+                          ? "bg-accent-cyan shadow-[0_0_6px_rgba(0,240,255,0.8)]"
+                          : "bg-text-muted"
+                      )}
                     />
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                    {item.label}
 
-        {/* ── Mobile Hamburger ── */}
-        <button
-          type="button"
-          onClick={() => setMobileOpen((prev) => !prev)}
-          className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-[5px] md:hidden"
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-        >
-          <motion.span
-            variants={topLineVariants}
-            animate={mobileOpen ? "open" : "closed"}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="block h-[2px] w-5 origin-center bg-text-primary"
-          />
-          <motion.span
-            variants={middleLineVariants}
-            animate={mobileOpen ? "open" : "closed"}
-            transition={{ duration: 0.15 }}
-            className="block h-[2px] w-5 origin-center bg-text-primary"
-          />
-          <motion.span
-            variants={bottomLineVariants}
-            animate={mobileOpen ? "open" : "closed"}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="block h-[2px] w-5 origin-center bg-text-primary"
-          />
-        </button>
-      </nav>
+                    {/* Animated underline — shared layoutId for sliding effect */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="navbar-underline"
+                        className="absolute bottom-0 left-4 right-4 h-px bg-accent-cyan shadow-[0_0_8px_rgba(0,240,255,0.6)]"
+                        transition={
+                          shouldReduceMotion
+                            ? { duration: 0 }
+                            : {
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 30,
+                              }
+                        }
+                      />
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
 
-      {/* ── Mobile Full-Screen Overlay ── */}
+          {/* ── Mobile Hamburger ── */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen((prev) => !prev)}
+            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-[5px] md:hidden"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+          >
+            <motion.span
+              variants={topLineVariants}
+              animate={mobileOpen ? "open" : "closed"}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="block h-[2px] w-5 origin-center bg-text-primary"
+            />
+            <motion.span
+              variants={middleLineVariants}
+              animate={mobileOpen ? "open" : "closed"}
+              transition={{ duration: 0.15 }}
+              className="block h-[2px] w-5 origin-center bg-text-primary"
+            />
+            <motion.span
+              variants={bottomLineVariants}
+              animate={mobileOpen ? "open" : "closed"}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="block h-[2px] w-5 origin-center bg-text-primary"
+            />
+          </button>
+        </nav>
+      </header>
+
+      {/* ── Mobile Full-Screen Overlay (outside header to avoid backdrop-filter containing block) ── */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -229,7 +231,7 @@ export function Navbar() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-40 flex flex-col bg-bg-base backdrop-blur-lg md:hidden"
+            className="fixed inset-0 z-40 flex flex-col bg-bg-base md:hidden"
           >
             {/* Decorative grid overlay */}
             <div className="pointer-events-none absolute inset-0 grid-overlay opacity-[0.03]" />
@@ -312,6 +314,6 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
