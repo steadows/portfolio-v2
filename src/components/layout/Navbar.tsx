@@ -229,7 +229,7 @@ export function Navbar() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-40 flex flex-col bg-bg-base/95 backdrop-blur-lg md:hidden"
+            className="fixed inset-0 z-40 flex flex-col bg-bg-base backdrop-blur-lg md:hidden"
           >
             {/* Decorative grid overlay */}
             <div className="pointer-events-none absolute inset-0 grid-overlay opacity-[0.03]" />
