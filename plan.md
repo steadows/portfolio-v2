@@ -224,14 +224,14 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
 ## Phase 11: Performance, SEO & Polish
 > GSD Step 11 — Ship it
 
-- [ ] **Mobile Polish:** Fix specific sizing issues (ensure perfect adaptation to phone screens)
+- [x] **Mobile Polish:** Fix specific sizing issues (ensure perfect adaptation to phone screens)
   - **Rule:** Mobile-first — only adjust base (unprefixed) Tailwind classes or add new responsive prefixes. Never remove or change existing `md:`/`lg:` classes unless explicitly needed.
   - **Watch for:** Fixed pixel values, hardcoded widths, `overflow-hidden` masking horizontal scroll issues, text sizes that don't scale down, padding/margins too large on small screens.
   - **Verify:** After each batch of changes, confirm both mobile (<375px, 390px) AND desktop (1280px+) render correctly — no regressions.
   - **Targets:** iPhone SE (375px), iPhone 15 (393px), standard Android (360px)
   - Audit pages: Home (Hero, Skills, Projects), Projects grid, Project detail, Blog index, Blog post, About, Contact, 404
-- [ ] **Favicon System:** Create and add browser tab icon (`icon.png`, `apple-icon.png`)
-- [ ] **Link Previews (Open Graph):** Configure social share previews (image, title, description) for texts/socials
+- [x] **Favicon System:** Create and add browser tab icon (`icon.png`, `apple-icon.png`)
+- [x] **Link Previews (Open Graph):** Configure social share previews (image, title, description) for texts/socials
 - [ ] Lighthouse audit — target 90+ on all metrics
 - [ ] Image optimization (next/image, WebP, lazy loading)
 - [ ] `robots.txt` + `sitemap.xml` generation

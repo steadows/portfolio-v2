@@ -21,6 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://steve-meadows.com"),
   title: {
     default: "Steve Meadows | Data Scientist & ML Engineer",
     template: "%s | Steve Meadows",
@@ -56,7 +57,8 @@ export const metadata: Metadata = {
     follow: true,
   },
   icons: {
-    icon: "/icon.png",
+    icon: "/icon",
+    apple: "/apple-icon",
   },
 };
 
