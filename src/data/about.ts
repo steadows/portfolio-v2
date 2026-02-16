@@ -101,7 +101,7 @@ export const timeline: TimelineEntry[] = [
     role: "IT Analyst",
     company: "MillerKnoll",
     location: "Holland, MI",
-    period: "Oct 2016 – Present",
+    period: "Oct 2016 – Nov 2025",
     order: 3,
     type: "work",
     accentColor: "cyan",
@@ -123,7 +123,7 @@ export const timeline: TimelineEntry[] = [
     highlights: [
       "Core studies in algorithms, data structures, systems programming, and software engineering",
       "Foundation in C, Java, Python, and database systems",
-      "Capstone and elective focus on machine learning and data science",
+      "Elective focus on machine learning and data science",
     ],
   },
   {
