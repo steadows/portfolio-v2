@@ -23,7 +23,10 @@ export interface Database {
           message?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
   };
 }

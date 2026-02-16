@@ -1,11 +1,14 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/types";
 
 export interface SubmitContactResult {
   success: boolean;
   error?: string;
 }
+
+type MessageInsert = Database["public"]["Tables"]["messages"]["Insert"];
 
 export async function submitContactMessage(data: {
   name: string;
@@ -15,11 +18,13 @@ export async function submitContactMessage(data: {
   try {
     const supabase = createServerClient();
 
-    const { error } = await supabase.from("messages").insert({
+    const row: MessageInsert = {
       name: data.name.trim(),
       email: data.email.trim().toLowerCase(),
       message: data.message.trim(),
-    });
+    };
+
+    const { error } = await supabase.from("messages").insert(row);
 
     if (error) {
       console.error("[CONTACT] Supabase insert error:", error);
