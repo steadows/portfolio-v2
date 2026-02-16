@@ -19,12 +19,22 @@ export interface KeyMetric {
   value: string;
 }
 
+/** An embedded interactive visualization (e.g. Tableau Public dashboard) */
+export interface EmbedVisualization {
+  /** Display title for the embed */
+  title: string;
+  /** Embed-ready URL (e.g. Tableau Public /views/ URL with embed params) */
+  url: string;
+}
+
 /** Full detail content for the project detail page */
 export interface ProjectDetail {
   /** Narrative sections (Problem → Approach → Results, etc.) */
   sections: ProjectSection[];
   /** Key stats shown in a metrics panel */
   keyMetrics: KeyMetric[];
+  /** Embedded interactive visualizations (optional) */
+  embeds?: EmbedVisualization[];
   /** Team members (optional) */
   team?: string[];
   /** Academic course or context (optional) */
@@ -841,15 +851,92 @@ export const projects: Project[] = [
     title: "BJJ ADCC ANALYSIS",
     subtitle: "Competition Analytics",
     category: "stats",
-    tags: ["Sports Analytics", "Tableau", "Visualization", "Competition Data"],
+    tags: [
+      "Sports Analytics",
+      "Tableau",
+      "Data Visualization",
+      "Competition Data",
+      "Interactive Dashboards",
+    ],
     description:
-      "Data-driven analysis of ADCC submission grappling championships using Tableau, uncovering winning strategies, submission patterns, and competitive trends.",
+      "Interactive Tableau dashboard analyzing ADCC submission grappling championships — uncovering dominant submissions, the rise of leg locks, weight class dynamics, and the counterintuitive finding that fighter specialization outperforms versatility.",
     longDescription:
-      "Created an interactive Tableau dashboard analyzing ADCC submission grappling competition data across multiple years. Identified trends in winning techniques, weight class dynamics, competitor performance trajectories, and strategic patterns that differentiate champions.",
+      "Built a multi-view interactive Tableau dashboard analyzing the Abu Dhabi Combat Club (ADCC) submission grappling tournaments — the pinnacle of competitive Brazilian Jiu Jitsu. Using two publicly available Kaggle datasets (historical match data and fighter statistics), the project identifies the most effective submissions across weight classes, tracks the rise of leg locks over time via regression analysis, and explores performance patterns through filterable visualizations. Key finding: a small handful of submissions dominate competition victories, and fighters with narrower submission repertoires tend to outperform those with broader ones — specialization beats versatility at the highest level.",
     techStack: ["Tableau", "Python", "Pandas", "Excel"],
     image: "/projects/bjj-adcc.png",
     liveDemo: "https://public.tableau.com",
     featured: false,
+    detail: {
+      sections: [
+        {
+          id: "overview",
+          title: "OVERVIEW",
+          content:
+            "Brazilian Jiu Jitsu (BJJ) is a grappling martial art emphasizing submissions over strikes, and its competitive scene has grown globally — with the **Abu Dhabi Combat Club (ADCC)** tournament standing as its pinnacle. For athletes and coaches, identifying trends in techniques and understanding performance metrics are crucial for achieving success at the highest level.\n\nThis project leverages **data visualization** to analyze BJJ competition data. Using two publicly available datasets from Kaggle, the dashboard visualizes submission trends, performance metrics, and global participation. The project focuses on answering key research questions that benefit competitive practitioners and coaches:\n\n• What are the most effective submissions across weight classes and time periods?\n• How have performance trends evolved — win rates, match outcomes, and fighter success metrics?\n• What is the relationship between submission specialization and competitive success?",
+        },
+        {
+          id: "data-sources",
+          title: "DATA SOURCES",
+          content:
+            "Two datasets from Kaggle were utilized for the analysis:\n\n**ADCC Historical Dataset** — Match-level data including submissions, outcomes, timelines, weight classes, and competition years. This forms the backbone of the submission analysis, enabling breakdowns by year, sex, and weight division.\n\n**ADCC Fighter Stats** — Detailed fighter-level statistics including weight class, win rates, submission repertoire, and career performance metrics. This dataset powers the fighter performance analysis and the specialization vs. versatility investigation.",
+        },
+        {
+          id: "submission-analysis",
+          title: "SUBMISSION ANALYSIS",
+          content:
+            "The core dashboard centers on understanding which submissions actually win matches at the highest level of competition.\n\n**Submission Proportions (Pie Chart)** — A color-coded pie chart displays the total proportion of submissions that successfully led to victories across ADCC history. Ordered in descending proportion going counter-clockwise, with annotated labels highlighting dominant techniques. This visualization allows coaches and fighters to immediately identify high-percentage techniques that consistently lead to success — and compare the relative frequency of different submission types to inform training strategy.\n\n**Submissions Per Year (Bar Chart)** — A horizontal bar chart provides a more granular view by aggregating the count of each submission within specific competition years. The horizontal orientation optimizes space and improves readability for long submission names, enabling users to explore year-to-year variations and identify patterns in technique usage across competition periods.\n\n**Submission Categories By Year (Stacked Bar Chart)** — Submissions are grouped into four strategic categories — **Chokes**, **Leg Submissions**, **Arm Locks**, and **Other** — and displayed as a color-coded stacked bar chart per competition year. This generalized view helps practitioners and coaches streamline their approach, focusing offensive or defensive strategy based on the relative prominence of different submission types over time.",
+        },
+        {
+          id: "trend-analysis",
+          title: "RISE OF LEG LOCKS",
+          content:
+            "In the early days of competitive Jiu Jitsu, leg submissions were relatively uncommon. Over the years, the game has evolved significantly — and effective coaches and practitioners now emphasize the importance of a well-balanced attack strategy targeting both the upper and lower body.\n\n**Connected Dot Plot with Regression** — To visually highlight this trend, a connected dot plot displays the sum of leg submissions for each ADCC competition year, overlaid with a **regression line** that makes the upward trajectory unmistakable. This allows users to extrapolate the trend, underscoring the increasing imperative of being able to both **attack and defend** leg submissions in the modern era of Jiu Jitsu.\n\nThis visualization is the one element of the dashboard that remains static (not affected by filters), serving as a persistent strategic reference point — the rise of leg locks is a macro trend that transcends individual weight classes or competition years.",
+        },
+        {
+          id: "interactive-features",
+          title: "INTERACTIVE DASHBOARD",
+          content:
+            "With the exception of the leg lock trend plot, the entire dashboard is designed to be interactive, responding to filter selections that allow users to customize their analysis.\n\n**Sex Filter** — Toggle between male and female fighters. This dynamically updates the proportions in the pie chart, the counts in the submissions-per-year bar chart, and the category breakdowns to reflect the selected subset.\n\n**Year Filter** — Select a specific competition year to focus the analysis on the most relevant period. All submission charts update to reflect only the chosen year's data.\n\n**Weight Class Filter** — Weight plays a crucial role in how matches are strategized and won. Coaches and fighters can tailor their analysis to their specific weight division, developing strategies based on trends within their competitive bracket.\n\nThese filters provide a highly flexible experience — whether analyzing overall historical trends or drilling down into specific demographic and competitive subsets, the dashboard equips users with the granularity needed for informed decision-making.",
+        },
+        {
+          id: "key-insights",
+          title: "KEY INSIGHTS",
+          content:
+            "As a practitioner, this analysis provided several meaningful insights into the competitive landscape of Brazilian Jiu Jitsu.\n\n**The Dominance of Few** — The data revealed that a small handful of submissions dominate the competition in any given year, taking the lion's share of victories. This challenges the common perception that mastering a wide array of techniques is essential for success.\n\n**Specialization Beats Versatility** — In a supplementary analysis (not featured in the main dashboard), fighter performance was standardized using **z-score normalization** of submission win ratios and compared against the diversity of each fighter's submission repertoire. A counterintuitive trend emerged: **as the number of unique submission types decreased, fighter success increased.** The most successful fighters come prepared with a focused game plan and execute it with precision.\n\nThis insight aligns with Bruce Lee's famous words: *\"I fear not the man who has practiced 10,000 kicks once, but I fear the man who has practiced one kick 10,000 times.\"* At the highest levels of competition, mastery and specialization clearly outperform breadth.\n\n**The Leg Lock Revolution** — The regression analysis confirms what modern practitioners already feel on the mats: leg submissions are no longer optional. The upward trend demands that both offensive and defensive leg lock proficiency be core components of any serious competitor's game.",
+        },
+        {
+          id: "conclusion",
+          title: "CONCLUSION",
+          content:
+            "This project bridges the gap between data and strategy in Brazilian Jiu Jitsu. For practitioners, the dashboard offers actionable insights to refine training, focus on high-percentage techniques, and better prepare for competition. For coaches, it simplifies the process of analyzing performance trends and provides the evidence needed to develop effective training regimens.\n\nFuture work could expand this analysis by incorporating additional datasets — such as detailed match sequences or real-time performance data — and exploring machine learning models to predict outcomes based on historical trends. By continuing to integrate visualization and analytics into combat sports, we can unlock new levels of understanding and success for athletes at all levels.",
+        },
+      ],
+      keyMetrics: [
+        { label: "DATASETS", value: "2" },
+        { label: "DASHBOARDS", value: "3" },
+        { label: "FILTERS", value: "3" },
+        { label: "SUB TYPES", value: "25+" },
+        { label: "WEIGHT CLASSES", value: "8" },
+        { label: "COMP YEARS", value: "13" },
+      ],
+      embeds: [
+        {
+          title: "Submissions by Weight Class",
+          url: "https://public.tableau.com/views/241110_final_project_submissions_dashboard_BACKUP/Dashboard1?:embed=true&:display_count=n&:showVizHome=no",
+        },
+        {
+          title: "Performance Metrics",
+          url: "https://public.tableau.com/views/241110_final_project_submissions_dashboard_BACKUP/Dashboard2?:embed=true&:display_count=n&:showVizHome=no",
+        },
+        {
+          title: "Fighter Analysis",
+          url: "https://public.tableau.com/views/241110_final_project_submissions_dashboard_BACKUP/Dashboard3?:embed=true&:display_count=n&:showVizHome=no",
+        },
+      ],
+      team: ["Steve Meadows"],
+      course: "STA 518 — Data Visualization",
+      timeline: "Fall 2024",
+    },
   },
 ];
 

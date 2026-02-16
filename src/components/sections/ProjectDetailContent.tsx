@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   LuGithub,
@@ -11,7 +12,7 @@ import {
   LuArrowLeft,
   LuArrowRight,
 } from "react-icons/lu";
-import type { Project } from "@/data/projects";
+import type { Project, EmbedVisualization } from "@/data/projects";
 import { cn } from "@/lib/utils";
 import { GlitchText } from "@/components/effects/GlitchText";
 import { SectionReveal } from "@/components/effects/SectionReveal";
@@ -160,6 +161,199 @@ function formatInlineText(text: string): string {
   return text.replace(
     /\*\*(.+?)\*\*/g,
     '<strong class="text-text-primary font-medium">$1</strong>'
+  );
+}
+
+// ─── Embed Tabs ─────────────────────────────────────────────────────────────
+
+/** Native size of the Tableau embed including Public chrome (px).
+ *  Dashboard canvas is 1300x900; extra height accounts for the
+ *  "View on Tableau Public" footer bar (~27px). */
+const EMBED_NATIVE_W = 1300;
+const EMBED_NATIVE_H = 927;
+
+function EmbedTabs({
+  embeds,
+  accent,
+}: {
+  embeds: EmbedVisualization[];
+  accent: AccentColor;
+}) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const colors = accentStyles[accent];
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  const updateScale = useCallback(() => {
+    if (!containerRef.current) return;
+    const containerW = containerRef.current.offsetWidth;
+    setScale(containerW / EMBED_NATIVE_W);
+  }, []);
+
+  useEffect(() => {
+    updateScale();
+    const ro = new ResizeObserver(updateScale);
+    if (containerRef.current) ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, [updateScale]);
+
+  const scaledHeight = EMBED_NATIVE_H * scale;
+
+  /** Build the Tableau Public link (strip embed params) for external open */
+  const publicUrl = embeds[activeIdx].url.split("?")[0];
+
+  return (
+    <div>
+      {/* ── Mobile / Tablet: link cards instead of embedded iframes ── */}
+      <div className="lg:hidden">
+        <div className="space-y-3">
+          {embeds.map((embed, idx) => (
+            <a
+              key={idx}
+              href={embed.url.split("?")[0]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                "flex items-center justify-between border px-5 py-4 transition-all duration-200",
+                colors.border,
+                "bg-white/[0.02] hover:bg-white/[0.05]"
+              )}
+              style={{
+                boxShadow: `0 0 0 rgba(${colors.glowRgb}, 0)`,
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.boxShadow =
+                  `0 0 16px rgba(${colors.glowRgb}, 0.2)`;
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.boxShadow =
+                  `0 0 0 rgba(${colors.glowRgb}, 0)`;
+              }}
+            >
+              <div>
+                <p className="font-heading text-[10px] uppercase tracking-[0.2em] text-text-primary">
+                  {embed.title}
+                </p>
+                <p className="mt-1 font-heading text-[9px] uppercase tracking-[0.15em] text-text-muted">
+                  Open in Tableau Public
+                </p>
+              </div>
+              <LuExternalLink
+                className={cn("h-4 w-4 shrink-0", colors.text)}
+                aria-hidden="true"
+              />
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Desktop: full interactive embeds ── */}
+      <div className="hidden lg:block">
+        {/* Tab bar */}
+        {embeds.length > 1 && (
+          <div className="mb-4 flex gap-2 overflow-x-auto">
+            {embeds.map((embed, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveIdx(idx)}
+                className={cn(
+                  "shrink-0 border px-4 py-2 font-heading text-[10px] uppercase tracking-[0.2em] transition-all duration-200",
+                  idx === activeIdx
+                    ? cn(colors.border, colors.bgMuted, colors.text)
+                    : "border-white/10 text-text-muted hover:border-white/20 hover:text-text-secondary"
+                )}
+                style={
+                  idx === activeIdx
+                    ? {
+                        boxShadow: `0 0 12px rgba(${colors.glowRgb}, 0.15)`,
+                      }
+                    : undefined
+                }
+              >
+                {embed.title}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Embed container — scales iframe to fit */}
+        <div
+          ref={containerRef}
+          className={cn(
+            "relative overflow-hidden border",
+            colors.border,
+            "bg-bg-base"
+          )}
+          style={{
+            height: scaledHeight,
+            boxShadow: `0 0 20px rgba(${colors.glowRgb}, 0.08), inset 0 0 20px rgba(${colors.glowRgb}, 0.03)`,
+          }}
+        >
+          {/* Corner accents */}
+          <div
+            className={cn(
+              "pointer-events-none absolute left-0 top-0 z-10 h-4 w-4 border-l-2 border-t-2",
+              colors.border
+            )}
+            aria-hidden="true"
+          />
+          <div
+            className={cn(
+              "pointer-events-none absolute right-0 top-0 z-10 h-4 w-4 border-r-2 border-t-2",
+              colors.border
+            )}
+            aria-hidden="true"
+          />
+          <div
+            className={cn(
+              "pointer-events-none absolute bottom-0 left-0 z-10 h-4 w-4 border-b-2 border-l-2",
+              colors.border
+            )}
+            aria-hidden="true"
+          />
+          <div
+            className={cn(
+              "pointer-events-none absolute bottom-0 right-0 z-10 h-4 w-4 border-b-2 border-r-2",
+              colors.border
+            )}
+            aria-hidden="true"
+          />
+
+          {/* Iframe rendered at native size, then CSS-scaled to fit */}
+          <iframe
+            src={embeds[activeIdx].url}
+            title={embeds[activeIdx].title}
+            width={EMBED_NATIVE_W}
+            height={EMBED_NATIVE_H}
+            className="block origin-top-left border-0"
+            style={{ transform: `scale(${scale})` }}
+            allowFullScreen
+            loading="lazy"
+          />
+        </div>
+
+        {/* Embed label */}
+        <div className="mt-3 flex items-center justify-between">
+          <p className="font-heading text-[9px] uppercase tracking-[0.2em] text-text-muted">
+            {embeds[activeIdx].title}
+            {embeds.length > 1 && (
+              <span className="ml-2 opacity-50">
+                {activeIdx + 1} / {embeds.length}
+              </span>
+            )}
+          </p>
+          <a
+            href={publicUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 font-heading text-[9px] uppercase tracking-[0.2em] text-text-muted transition-colors hover:text-text-primary"
+          >
+            <LuExternalLink className="h-3 w-3" />
+            Open in Tableau
+          </a>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -313,6 +507,20 @@ export function ProjectDetailContent({
             <p className="text-sm leading-relaxed text-text-secondary">
               {project.longDescription}
             </p>
+          </section>
+        </SectionReveal>
+      )}
+
+      {/* ── Interactive Embeds (Tableau, etc.) ── */}
+      {detail?.embeds && detail.embeds.length > 0 && (
+        <SectionReveal animation="fadeUp" delay={0.1} duration={0.5}>
+          <section className="mb-12">
+            <SectionLabel title="Interactive Dashboards" accent={accent} />
+            <p className="mb-6 text-sm text-text-muted">
+              Explore the live Tableau dashboards below — filters and
+              interactions are fully functional.
+            </p>
+            <EmbedTabs embeds={detail.embeds} accent={accent} />
           </section>
         </SectionReveal>
       )}

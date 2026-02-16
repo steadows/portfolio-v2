@@ -144,7 +144,7 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
   - Flesh out detail page content, screenshots/visuals, results narrative
 - [x] **Order History DFA** (Time Series) — `order-history-dfa`
   - Flesh out detail page content, screenshots/visuals, results narrative
-- [ ] **BJJ ADCC Analysis** (Tableau) — `bjj-adcc-analysis`
+- [x] **BJJ ADCC Analysis** (Tableau) — `bjj-adcc-analysis`
   - Flesh out detail page content, screenshots/visuals, results narrative
 
 ## Phase 7: About Page
