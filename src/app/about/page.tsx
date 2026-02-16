@@ -74,67 +74,73 @@ export default function AboutPage() {
       </SectionReveal>
 
       {/* ── Experience & Education Timeline ── */}
-      <SectionReveal animation="fadeUp" delay={0.1}>
-        <div className="mb-10 flex flex-col items-center gap-2 text-center">
-          <span className="font-heading text-[10px] tracking-[0.3em] text-text-muted">
-            SECTION // 002
-          </span>
-          <GlitchText
-            as="h2"
-            glowColor="cyan"
-            className="font-heading text-2xl font-bold text-text-primary md:text-3xl"
-          >
-            EXPERIENCE
-          </GlitchText>
-          <div
-            className="h-px w-16 bg-gradient-to-r from-transparent via-accent-cyan/30 to-transparent"
-            aria-hidden="true"
-          />
-        </div>
+      <div>
+        <SectionReveal animation="fadeUp" delay={0.1}>
+          <div className="mb-10 flex flex-col items-center gap-2 text-center">
+            <span className="font-heading text-[10px] tracking-[0.3em] text-text-muted">
+              SECTION // 002
+            </span>
+            <GlitchText
+              as="h2"
+              glowColor="cyan"
+              className="font-heading text-2xl font-bold text-text-primary md:text-3xl"
+            >
+              EXPERIENCE
+            </GlitchText>
+            <div
+              className="h-px w-16 bg-gradient-to-r from-transparent via-accent-cyan/30 to-transparent"
+              aria-hidden="true"
+            />
+          </div>
+        </SectionReveal>
         <AboutTimeline entries={timeline} />
-      </SectionReveal>
+      </div>
 
       {/* ── Achievements ── */}
-      <SectionReveal animation="fadeUp" delay={0.1}>
-        <div className="mb-10 flex flex-col items-center gap-2 text-center">
-          <span className="font-heading text-[10px] tracking-[0.3em] text-text-muted">
-            SECTION // 003
-          </span>
-          <GlitchText
-            as="h2"
-            glowColor="green"
-            className="font-heading text-2xl font-bold text-text-primary md:text-3xl"
-          >
-            ACHIEVEMENTS
-          </GlitchText>
-          <div
-            className="h-px w-16 bg-gradient-to-r from-transparent via-accent-green/30 to-transparent"
-            aria-hidden="true"
-          />
-        </div>
+      <div>
+        <SectionReveal animation="fadeUp" delay={0.1}>
+          <div className="mb-10 flex flex-col items-center gap-2 text-center">
+            <span className="font-heading text-[10px] tracking-[0.3em] text-text-muted">
+              SECTION // 003
+            </span>
+            <GlitchText
+              as="h2"
+              glowColor="green"
+              className="font-heading text-2xl font-bold text-text-primary md:text-3xl"
+            >
+              ACHIEVEMENTS
+            </GlitchText>
+            <div
+              className="h-px w-16 bg-gradient-to-r from-transparent via-accent-green/30 to-transparent"
+              aria-hidden="true"
+            />
+          </div>
+        </SectionReveal>
         <AboutAchievements achievements={achievements} />
-      </SectionReveal>
+      </div>
 
       {/* ── Philosophy / Approach ── */}
-      <SectionReveal animation="fadeUp" delay={0.1}>
-        <div className="mb-10 flex flex-col items-center gap-2 text-center">
-          <span className="font-heading text-[10px] tracking-[0.3em] text-text-muted">
-            SECTION // 004
-          </span>
-          <GlitchText
-            as="h2"
-            glowColor="amber"
-            className="font-heading text-2xl font-bold text-text-primary md:text-3xl"
-          >
-            APPROACH
-          </GlitchText>
-          <div
-            className="h-px w-16 bg-gradient-to-r from-transparent via-accent-amber/30 to-transparent"
-            aria-hidden="true"
-          />
-        </div>
+      <div>
+        <SectionReveal animation="fadeUp" delay={0.1}>
+          <div className="mb-10 flex flex-col items-center gap-2 text-center">
+            <span className="font-heading text-[10px] tracking-[0.3em] text-text-muted">
+              SECTION // 004
+            </span>
+            <GlitchText
+              as="h2"
+              glowColor="amber"
+              className="font-heading text-2xl font-bold text-text-primary md:text-3xl"
+            >
+              APPROACH
+            </GlitchText>
+            <div
+              className="h-px w-16 bg-gradient-to-r from-transparent via-accent-amber/30 to-transparent"
+              aria-hidden="true"
+            />
+          </div>
+        </SectionReveal>
         <AboutPhilosophy />
-      </SectionReveal>
+      </div>
 
       {/* ── End of File ── */}
       <div className="flex items-center justify-center gap-3 pt-4">
