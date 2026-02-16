@@ -209,13 +209,13 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
 ## Phase 10: Supabase Integration
 > GSD Step 10 — Backend power
 
-- [ ] Set up Supabase project
-- [ ] Contact form submissions → `messages` table
+- [ ] Set up Supabase project (create at supabase.com, run `supabase/migrations/20250215000000_create_messages_table.sql`)
+- [x] Contact form submissions → `messages` table
 - [ ] Optional: page view analytics → `page_views` table
 - [ ] Optional: blog migration to Supabase CMS
   - `posts` table with markdown content
   - Dynamic blog routes
-- [ ] Environment variables configuration
+- [x] Environment variables configuration (`.env.example` + Vercel)
 
 ## Phase 11: Performance, SEO & Polish
 > GSD Step 11 — Ship it

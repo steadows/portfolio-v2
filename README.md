@@ -29,6 +29,15 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Supabase (Contact Form)
+
+The contact form stores submissions in Supabase. To enable:
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Run the migration in **SQL Editor** → paste contents of `supabase/migrations/20250215000000_create_messages_table.sql`
+3. Copy `.env.example` to `.env.local` and fill in your project URL and service role key (Settings → API)
+4. Add the same env vars to Vercel (Project → Settings → Environment Variables)
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

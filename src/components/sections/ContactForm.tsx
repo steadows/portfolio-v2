@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { submitContactMessage } from "@/app/contact/actions";
 import {
   Form,
   FormControl,
@@ -66,11 +67,13 @@ export function ContactForm() {
     defaultValues: { name: "", email: "", message: "" },
   });
 
-  function onSubmit(data: ContactFormValues) {
-    // TODO: Wire to Supabase in Phase 9
-    // eslint-disable-next-line no-console
-    console.log("[CONTACT FORM] Submission:", data);
-    setSubmitted(true);
+  async function onSubmit(data: ContactFormValues) {
+    const result = await submitContactMessage(data);
+    if (result.success) {
+      setSubmitted(true);
+    } else {
+      form.setError("root", { message: result.error ?? "Failed to send message" });
+    }
   }
 
   return (
@@ -197,6 +200,12 @@ export function ContactForm() {
                     )}
                   />
                 ))}
+
+                {form.formState.errors.root && (
+                  <p className="font-heading text-[10px] tracking-wider text-accent-red">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
 
                 {/* Submit Button */}
                 <motion.div
