@@ -3,7 +3,7 @@ import { TechArsenalSection } from "@/components/sections/TechArsenalSection";
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center px-4">
+    <main className="flex min-h-screen flex-col items-center overflow-x-hidden px-4">
       {/* ── Hero Section ── */}
       <HeroSection />
 

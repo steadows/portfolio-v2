@@ -140,7 +140,7 @@ export function HeroSection() {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-x-clip">
       {/* ── Decorative HUD corner markers ── */}
       <div
         className="pointer-events-none absolute inset-0 hidden sm:block"
@@ -154,12 +154,12 @@ export function HeroSection() {
         </span>
       </div>
 
-      {/* ── Center content ── */}
+      {/* ── Center content (flex-1 to fill space above badge bar) ── */}
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative z-10 flex max-w-2xl flex-col items-center gap-5 px-4 text-center"
+        className="relative z-10 flex flex-1 flex-col items-center justify-center gap-3 px-4 text-center sm:gap-5"
       >
         {/* Decorative divider */}
         <motion.div
@@ -262,18 +262,18 @@ export function HeroSection() {
         </motion.div>
       </motion.div>
 
-      {/* ── Scroll-down indicator ── */}
-      <ScrollIndicator targetId="content" />
+      {/* ── Scroll-down indicator (lifted above in-flow badge bar) ── */}
+      <ScrollIndicator targetId="content" className="bottom-16" />
 
-      {/* ── Horizontal tech logo bar ── */}
+      {/* ── Horizontal tech logo bar (in-flow — sits below center content) ── */}
       <motion.div
         variants={badgeContainerVariants}
         initial="hidden"
         animate="visible"
-        className="absolute bottom-0 left-0 right-0 border-t border-white/5 bg-bg-primary/60 backdrop-blur-sm"
+        className="relative z-10 mt-auto border-t border-white/5 bg-bg-base/60 backdrop-blur-sm"
         aria-label="Core technologies"
       >
-        <div className="mx-auto flex max-w-4xl items-center justify-center gap-6 px-4 py-3 sm:gap-8 md:gap-10">
+        <div className="mx-auto flex max-w-4xl items-center justify-center gap-3 px-4 py-3 sm:gap-8 md:gap-10">
           {skillBadges.map((badge) => {
             const Icon = badge.icon;
             const colors = badgeColorMap[badge.color];

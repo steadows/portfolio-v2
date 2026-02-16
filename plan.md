@@ -164,7 +164,7 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
 - [x] Form validation with Shadcn form components + zod
 - [x] Success state: "TRANSMISSION SENT" confirmation animation
 - [x] Social links bar: GitHub, LinkedIn, `steve@stevemeadows.dev`
-- [ ] Optional: Supabase edge function for email notification
+- [x] Email notification via Resend on contact form submission
 
 ## Phase 9: Blog
 > GSD Step 9 — Articles, research, and work-in-progress
@@ -216,11 +216,20 @@ Ultra-modern, flashy, techie/militaristic data science portfolio. Think: dark th
   - `posts` table with markdown content
   - Dynamic blog routes
 - [x] Environment variables configuration (`.env.example` + Vercel)
+- [x] Email notification via Resend on contact form submission
+- [ ] Optional: Gmail "Send mail as" `steve@steve-meadows.com` via Resend SMTP
+  - Gmail Settings → Accounts → Send mail as → add domain with Resend SMTP credentials
+  - Enables replying as your domain from Gmail / phone
 
 ## Phase 11: Performance, SEO & Polish
 > GSD Step 11 — Ship it
 
 - [ ] **Mobile Polish:** Fix specific sizing issues (ensure perfect adaptation to phone screens)
+  - **Rule:** Mobile-first — only adjust base (unprefixed) Tailwind classes or add new responsive prefixes. Never remove or change existing `md:`/`lg:` classes unless explicitly needed.
+  - **Watch for:** Fixed pixel values, hardcoded widths, `overflow-hidden` masking horizontal scroll issues, text sizes that don't scale down, padding/margins too large on small screens.
+  - **Verify:** After each batch of changes, confirm both mobile (<375px, 390px) AND desktop (1280px+) render correctly — no regressions.
+  - **Targets:** iPhone SE (375px), iPhone 15 (393px), standard Android (360px)
+  - Audit pages: Home (Hero, Skills, Projects), Projects grid, Project detail, Blog index, Blog post, About, Contact, 404
 - [ ] **Favicon System:** Create and add browser tab icon (`icon.png`, `apple-icon.png`)
 - [ ] **Link Previews (Open Graph):** Configure social share previews (image, title, description) for texts/socials
 - [ ] Lighthouse audit — target 90+ on all metrics
