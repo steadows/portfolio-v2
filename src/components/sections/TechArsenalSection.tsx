@@ -371,7 +371,7 @@ export function TechArsenalSection() {
               variants={shouldReduceMotion ? undefined : skillGridVariants}
               initial={shouldReduceMotion ? false : "hidden"}
               animate="visible"
-              className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6"
+              className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-6"
             >
               {activeData.skills.map((skill) => {
                 const Icon = skillIconMap[skill.name];
