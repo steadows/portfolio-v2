@@ -12,7 +12,8 @@ import {
   LuArrowLeft,
   LuArrowRight,
 } from "react-icons/lu";
-import type { Project, EmbedVisualization } from "@/data/projects";
+import Image from "next/image";
+import type { Project, EmbedVisualization, ProjectScreenshot } from "@/data/projects";
 import { cn } from "@/lib/utils";
 import { GlitchText } from "@/components/effects/GlitchText";
 import { SectionReveal } from "@/components/effects/SectionReveal";
@@ -190,6 +191,147 @@ function formatInlineText(text: string): string {
   );
 
   return withPlaceholders;
+}
+
+// ─── Screenshot Gallery ─────────────────────────────────────────────────────
+
+function ScreenshotGallery({
+  screenshots,
+  accent,
+}: {
+  screenshots: ProjectScreenshot[];
+  accent: AccentColor;
+}) {
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const colors = accentStyles[accent];
+
+  return (
+    <>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {screenshots.map((shot, idx) => (
+          <button
+            key={idx}
+            onClick={() => setSelectedIdx(idx)}
+            className={cn(
+              "group relative overflow-hidden border text-left transition-all duration-300",
+              colors.border,
+              "bg-bg-base hover:bg-white/[0.02]"
+            )}
+            style={{
+              boxShadow: `0 0 0 rgba(${colors.glowRgb}, 0)`,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.boxShadow =
+                `0 0 20px rgba(${colors.glowRgb}, 0.15)`;
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.boxShadow =
+                `0 0 0 rgba(${colors.glowRgb}, 0)`;
+            }}
+          >
+            <div className="relative aspect-video w-full">
+              <Image
+                src={shot.src}
+                alt={shot.alt}
+                fill
+                className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+                sizes="(max-width: 640px) 100vw, 50vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg-base/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            </div>
+            {shot.caption && (
+              <p className="px-3 py-2.5 font-heading text-[9px] uppercase tracking-[0.2em] text-text-muted">
+                {shot.caption}
+              </p>
+            )}
+            {/* Corner accents */}
+            <div
+              className={cn(
+                "pointer-events-none absolute left-0 top-0 h-3 w-3 border-l border-t",
+                colors.border
+              )}
+              aria-hidden="true"
+            />
+            <div
+              className={cn(
+                "pointer-events-none absolute right-0 top-0 h-3 w-3 border-r border-t",
+                colors.border
+              )}
+              aria-hidden="true"
+            />
+          </button>
+        ))}
+      </div>
+
+      {/* Lightbox */}
+      {selectedIdx !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-bg-base/90 backdrop-blur-sm"
+          onClick={() => setSelectedIdx(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Screenshot preview"
+        >
+          <div
+            className="relative mx-4 max-h-[85vh] max-w-5xl overflow-hidden border"
+            style={{
+              borderColor: `rgba(${colors.glowRgb}, 0.3)`,
+              boxShadow: `0 0 40px rgba(${colors.glowRgb}, 0.15), 0 0 80px rgba(${colors.glowRgb}, 0.05)`,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={screenshots[selectedIdx].src}
+              alt={screenshots[selectedIdx].alt}
+              width={1920}
+              height={1080}
+              className="h-auto max-h-[85vh] w-full object-contain"
+              priority
+            />
+            {screenshots[selectedIdx].caption && (
+              <div className="absolute bottom-0 left-0 right-0 bg-bg-base/80 px-4 py-2.5 backdrop-blur-sm">
+                <p className={cn("font-heading text-[10px] uppercase tracking-[0.2em]", colors.text)}>
+                  {screenshots[selectedIdx].caption}
+                </p>
+              </div>
+            )}
+            <button
+              onClick={() => setSelectedIdx(null)}
+              className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center border border-white/20 bg-bg-base/80 font-heading text-xs text-text-secondary backdrop-blur-sm transition-colors hover:border-white/40 hover:text-text-primary"
+              aria-label="Close preview"
+            >
+              &times;
+            </button>
+            {/* Prev / Next in lightbox */}
+            {screenshots.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedIdx((selectedIdx - 1 + screenshots.length) % screenshots.length);
+                  }}
+                  className="absolute left-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center border border-white/20 bg-bg-base/80 font-heading text-xs text-text-secondary backdrop-blur-sm transition-colors hover:border-white/40 hover:text-text-primary"
+                  aria-label="Previous screenshot"
+                >
+                  &lsaquo;
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedIdx((selectedIdx + 1) % screenshots.length);
+                  }}
+                  className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center border border-white/20 bg-bg-base/80 font-heading text-xs text-text-secondary backdrop-blur-sm transition-colors hover:border-white/40 hover:text-text-primary"
+                  aria-label="Next screenshot"
+                >
+                  &rsaquo;
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 // ─── Embed Tabs ─────────────────────────────────────────────────────────────
@@ -535,6 +677,16 @@ export function ProjectDetailContent({
             <p className="text-sm leading-relaxed text-text-secondary">
               {project.longDescription}
             </p>
+          </section>
+        </SectionReveal>
+      )}
+
+      {/* ── Screenshot Gallery ── */}
+      {detail?.screenshots && detail.screenshots.length > 0 && (
+        <SectionReveal animation="fadeUp" delay={0.1} duration={0.5}>
+          <section className="mb-12">
+            <SectionLabel title="Screenshots" accent={accent} />
+            <ScreenshotGallery screenshots={detail.screenshots} accent={accent} />
           </section>
         </SectionReveal>
       )}

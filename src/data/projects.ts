@@ -27,6 +27,16 @@ export interface EmbedVisualization {
   url: string;
 }
 
+/** A screenshot with caption for the project gallery */
+export interface ProjectScreenshot {
+  /** Path to the image (relative to /public) */
+  src: string;
+  /** Alt text for accessibility */
+  alt: string;
+  /** Optional caption displayed below the image */
+  caption?: string;
+}
+
 /** Full detail content for the project detail page */
 export interface ProjectDetail {
   /** Narrative sections (Problem → Approach → Results, etc.) */
@@ -35,6 +45,8 @@ export interface ProjectDetail {
   keyMetrics: KeyMetric[];
   /** Embedded interactive visualizations (optional) */
   embeds?: EmbedVisualization[];
+  /** Screenshot gallery (optional) */
+  screenshots?: ProjectScreenshot[];
   /** Team members (optional) */
   team?: string[];
   /** Academic course or context (optional) */
@@ -100,6 +112,122 @@ export const categoryAccentMap: Record<
 
 export const projects: Project[] = [
   // ─── ML / AI (High Priority) ───────────────────────────────────────────────
+  {
+    slug: "overwatch",
+    title: "OVERWATCH",
+    subtitle: "Tactical Habit & Performance Intelligence System",
+    category: "ml",
+    tags: [
+      "Native macOS",
+      "SwiftUI",
+      "Gemini AI",
+      "NLP",
+      "Sentiment Analysis",
+      "Linear Regression",
+      "WHOOP API",
+      "SwiftData",
+    ],
+    description:
+      "A native macOS intelligence system that fuses habit tracking, biometric data from WHOOP, and AI-powered analytics into a holographic HUD interface. Features NLP parsing, Gemini-driven sentiment analysis, linear regression for habit-mood correlation, and auto-generated performance briefings.",
+    longDescription:
+      "Overwatch is a native macOS application built with Swift 6, SwiftUI, and SwiftData that transforms personal habit tracking into a tactical intelligence operation. The app features a Jarvis-inspired holographic HUD aesthetic with translucent panels, wireframe traces, scan lines, and glow effects. It integrates with the WHOOP API for real-time biometric data (recovery, sleep, strain, HRV), uses Apple's NaturalLanguage framework and Gemini AI for sentiment analysis of journal entries, and performs linear regression via Apple's Accelerate framework to identify which habits most impact wellbeing. An AI performance coach generates weekly intel briefings with actionable recommendations.",
+    techStack: [
+      "Swift 6",
+      "SwiftUI",
+      "SwiftData",
+      "Gemini API",
+      "WHOOP API",
+      "Accelerate / LAPACK",
+      "NaturalLanguage",
+      "OAuth 2.0 / PKCE",
+      "Keychain Services",
+    ],
+    image: "/projects/overwatch-card.png",
+    github: "https://github.com/steadows/project_overwatch",
+    featured: true,
+    detail: {
+      sections: [
+        {
+          id: "overview",
+          title: "OVERVIEW",
+          content:
+            "Overwatch is a native macOS habit tracking and performance intelligence system designed around the concept of a tactical command center. Rather than yet another to-do app, it treats personal performance as an operations dashboard — tracking daily habits, syncing biometric data, scoring journal entries for emotional sentiment, and using machine learning to surface which behaviors actually move the needle on wellbeing.\n\nThe entire interface follows a **holographic HUD aesthetic** inspired by Tony Stark's Jarvis system — translucent panels floating on a near-black void, wireframe traces that draw themselves on appear, scan lines drifting across surfaces, and neon glow effects on every interactive element. The design principle: elements emit light, they don't just have color.",
+        },
+        {
+          id: "dashboard",
+          title: "TACTICAL DASHBOARD",
+          content:
+            "The dashboard is the daily operations center. The top section — **Today's Ops** — presents habit toggles as large, HUD-styled buttons that expand inline to reveal value and notes fields using a custom **Slide-Reveal** animation pattern. Each completion triggers a particle scatter burst and glow pulse.\n\nBelow that, a compact **Biometric Status** strip displays WHOOP recovery, sleep performance, daily strain, and HRV as color-coded metrics — green for strong performance, amber for moderate, and red for low. Tapping the strip expands it into full arc gauges with detailed readouts.\n\nA **Quick Input** field at the bottom accepts freeform natural language entries like \"Drank 3L water\" or \"Meditated 20 min\" — parsed locally via regex-based NLP with Gemini AI as a fallback for ambiguous inputs.",
+        },
+        {
+          id: "journal-sentiment",
+          title: "JOURNAL & SENTIMENT ENGINE",
+          content:
+            "The Journal section is where data becomes self-knowledge. Users write freeform daily entries about their thoughts, feelings, and experiences. When an entry is saved, its emotional sentiment is scored automatically.\n\n**Gemini AI** serves as the primary sentiment engine, scoring entries on a -1.0 to +1.0 scale with full understanding of negation, sarcasm, and context — where Apple's `NLTagger` (retained as an offline fallback) would naively score \"Today has not been that bad\" as strongly negative, Gemini correctly identifies the double-negation as mildly positive.\n\nSentiment scores are visualized as a time series chart with daily dots and a 7-day rolling average, providing a visual pulse of emotional wellbeing over time.",
+        },
+        {
+          id: "regression-analysis",
+          title: "REGRESSION ANALYSIS",
+          content:
+            "The crown jewel of the intelligence layer is a **monthly linear regression analysis** that correlates daily habit completion patterns with journal sentiment scores. Using Apple's **Accelerate framework** (LAPACK) for native-speed matrix operations, the system builds a feature matrix of habit completion vectors against sentiment as the target variable.\n\nThe regression identifies a **force multiplier** — the single habit with the highest positive correlation coefficient to emotional wellbeing. It computes R-squared goodness of fit, t-statistics, and approximate p-values for each habit coefficient. Results are presented as a horizontal bar chart showing positive (green) and negative (red) impact, with the force multiplier highlighted.\n\nGemini generates a **narrative interpretation** of the regression results — acting as a performance coach that explains the data in encouraging, actionable language and provides specific recommendations.",
+        },
+        {
+          id: "intel-briefings",
+          title: "INTEL BRIEFINGS",
+          content:
+            "The Reports page houses an archive of **AI-generated performance briefings**. These can be auto-generated on a configurable weekly schedule or triggered on-demand for any custom date range.\n\nEach briefing packages habit completion data, WHOOP biometric metrics, and journal sentiment scores into an XML-tagged payload sent to Gemini with a **RISEN-structured prompt** (Role, Instructions, Steps, Expectations, Narrowing). The AI performance coach persona analyzes cross-domain correlations — noting when high meditation frequency aligns with elevated recovery scores, or when sleep duration drops below threshold for consecutive nights.\n\nBriefings include a narrative summary, force multiplier identification, habit-sentiment correlations, and numbered actionable recommendations. All reports are persisted in SwiftData for offline viewing.",
+        },
+        {
+          id: "war-room",
+          title: "WAR ROOM",
+          content:
+            "The War Room is a split-pane analytics view — the AI briefing panel occupies the left 40% while interactive charts fill the right 60%. A draggable divider lets users adjust the ratio.\n\nSix chart types are available: **recovery score timeline** (color-zoned), **daily habit completion bars** (stacked by category), **habit-recovery scatter plot**, **sleep metrics area chart** (SWS, REM, total hours), **sentiment time series** (with toggleable habit overlay), and **habit-sentiment scatter** (visualizing the regression relationship).\n\nAll charts use HUD styling — cyan lines with glow effects, dark axes, subtle grid overlays — and animate with spring transitions when switching between chart types or date ranges.",
+        },
+        {
+          id: "architecture",
+          title: "TECHNICAL ARCHITECTURE",
+          content:
+            "The app is built entirely in **Swift 6** with strict concurrency enabled. The data layer uses **SwiftData** with `@Model` classes for habits, entries, journal entries, WHOOP cycles, monthly analyses, and weekly insights. All services are either `actor`-isolated or `Sendable`-conforming.\n\n**WHOOP integration** uses OAuth 2.0 with PKCE via `ASWebAuthenticationSession`, with automatic token management and background sync every 30 minutes. API credentials are read from a bundled `.env` file via a custom `EnvironmentConfig` loader.\n\n**Gemini integration** is centralized in a `GeminiService` actor that handles NLP parsing fallback, sentiment analysis, regression narrative generation, and weekly report generation — all with structured RISEN-framework prompts.\n\nThe **regression pipeline** is self-contained in Swift using `Accelerate` — no Python runtime, no external ML dependencies. The normal equation `(X'X)^(-1)X'y` is solved via Gaussian elimination with full coefficient statistics.",
+        },
+      ],
+      keyMetrics: [
+        { label: "GEMINI PIPELINES", value: "4" },
+        { label: "REGRESSION ENGINE", value: "LAPACK" },
+        { label: "NLP PARSING", value: "Hybrid" },
+        { label: "SENTIMENT RANGE", value: "±1.0" },
+        { label: "TEST SUITE", value: "125+" },
+        { label: "AUTH FLOW", value: "PKCE" },
+      ],
+      screenshots: [
+        {
+          src: "/projects/overwatch/dashboard.png",
+          alt: "Overwatch tactical dashboard with today's ops, biometric status strip, and habit toggles",
+          caption: "Tactical Dashboard — Today's Ops & Biometric Status",
+        },
+        {
+          src: "/projects/overwatch/biometrics.png",
+          alt: "Expanded biometric status panel showing WHOOP recovery, sleep, strain, and HRV gauges",
+          caption: "Biometric Status — WHOOP Integration",
+        },
+        {
+          src: "/projects/overwatch/journal-sentiment.png",
+          alt: "Journal entry with sentiment score badge showing day count, word count, and positivity rating",
+          caption: "Journal Entry — Gemini Sentiment Scoring",
+        },
+        {
+          src: "/projects/overwatch/regression-analysis.png",
+          alt: "Monthly intelligence report showing habit impact coefficients and force multiplier analysis",
+          caption: "Monthly Intelligence — Regression Analysis & Force Multiplier",
+        },
+        {
+          src: "/projects/overwatch/intel-briefing.png",
+          alt: "Intel briefing page showing AI-generated performance report with recommendations and correlations",
+          caption: "Intel Briefings — AI Performance Reports",
+        },
+      ],
+      timeline: "Dec 2025 — Present",
+    },
+  },
   {
     slug: "knn-recommender-birds",
     title: "kNN RECOMMENDER SYSTEM",
