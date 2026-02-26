@@ -57,3 +57,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+cursor-global-rule-dev-journal.md
+dev-journal-example.md
+DEV-JOURNAL-SETUP.md
+DISTILL-HOWTO.md
