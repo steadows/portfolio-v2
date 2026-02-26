@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { compileMDX } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
 import { LuArrowLeft, LuCalendar, LuClock, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { getPostBySlug, getPostSlugs, getAdjacentPosts } from "@/lib/blog";
 import { blogCategoryAccentMap } from "@/data/blog";
@@ -101,6 +102,11 @@ export default async function BlogPostPage({ params }: PageProps) {
   const { content: mdxContent } = await compileMDX({
     source: content,
     components: mdxComponents,
+    options: {
+      mdxOptions: {
+        remarkPlugins: [remarkGfm],
+      },
+    },
   });
 
   return (

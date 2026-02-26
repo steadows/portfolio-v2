@@ -1,0 +1,151 @@
+---
+title: "I Actually Tried Earthworm Optimization — Here's What Happened"
+date: "2026-02-26"
+excerpt: "Last month I wrote about EOA as a theoretical alternative to Bayesian Optimization. Then I entered a machine learning competition and put it to the test across six gradient boosting models. EOA won five out of six."
+tags: ["Machine Learning", "Earthworm Optimization", "Bayesian Optimization", "Hyperparameter Tuning", "Evolutionary Algorithms", "Gradient Boosting"]
+category: "article"
+readTime: "11 min read"
+featured: false
+status: "published"
+---
+
+# I Actually Tried Earthworm Optimization — Here's What Happened
+
+A couple weeks ago I wrote about [why evolution might beat probability in hyperparameter tuning](/blog/evolution-vs-probability-malware-detection) — riffing on a paper that used the Earthworm Optimization Algorithm (EOA) to tune a deep learning malware detector. I laid out the theory, compared it to my go-to Bayesian Optimization workflow, and ended with a list of situations where I'd consider trying EOA myself.
+
+Then I entered a machine learning competition. And I thought: why not actually do it?
+
+---
+
+## The Setup
+
+The competition involved building a probabilistic classifier — predicting win probabilities for sporting events evaluated by Brier Score. I had an ensemble pipeline with five models: a logistic regression baseline, a Ridge regression, and three gradient boosting machines (XGBoost, LightGBM, CatBoost). Each GBM had 3–7 tunable hyperparameters: tree depth, learning rate, regularization terms, subsampling ratios, and so on.
+
+The plan was simple: run two independent optimizers on every GBM, head-to-head, and pick the winner per model. In one corner, **Ax/BoTorch** — Meta's Bayesian Optimization platform backed by Gaussian Process surrogates, the same tool I'd used successfully on prior projects. In the other corner, **EOA via mealpy** — the Earthworm Optimization Algorithm I'd only read about.
+
+Both optimizers evaluated candidates the same way: 5-fold expanding-window cross-validation, same data splits, same evaluation metric. The only difference was how they chose which hyperparameters to try next.
+
+---
+
+## The Results
+
+I tuned six models total — three GBMs for two separate datasets (call them Dataset A and Dataset B, which had different sizes and characteristics). Here's the head-to-head:
+
+### Dataset A (larger, ~2,500 training examples)
+
+| Model | EOA Brier | Ax Brier | Winner |
+|----------|-----------|----------|--------|
+| XGBoost | **0.1826** | 0.1906 | EOA |
+| LightGBM | **0.1855** | 0.1921 | EOA |
+| CatBoost | **0.1862** | 0.1922 | EOA |
+
+EOA swept all three. Not by a razor-thin margin, either — the gaps ranged from 0.005 to 0.008 in Brier Score, which is meaningful when you're trying to squeeze below 0.19.
+
+### Dataset B (smaller, ~1,700 training examples)
+
+| Model | EOA Brier | Ax Brier | Winner |
+|----------|-----------|----------|--------|
+| XGBoost | 0.1332 | **0.1321** | Ax |
+| LightGBM | **0.1334** | 0.1371 | EOA |
+| CatBoost | **0.1296** | 0.1356 | EOA |
+
+EOA took two out of three. The one model Ax won — XGBoost on the smaller dataset — was by the thinnest margin in the entire experiment (0.001). Meanwhile, EOA's wins on LightGBM and CatBoost were decisive.
+
+**Final tally: EOA 5, Ax 1.**
+
+Every model improved substantially over default hyperparameters. The best single result was CatBoost on Dataset B, where EOA found a configuration scoring 0.1296 — down from 0.140 with defaults. That's a 7.4% reduction in Brier Score from tuning alone.
+
+---
+
+## What the Winning Configurations Looked Like
+
+The EOA-tuned hyperparameters told an interesting story. For XGBoost on Dataset A — the single best result — the optimizer converged on:
+
+- **Deeper trees** (max_depth=9 vs. default 5)
+- **Higher learning rate** (0.24 vs. 0.05)
+- **More regularization** (reg_alpha=0.83, reg_lambda=0.51 vs. 0.1/1.0)
+- **Less feature sampling** (colsample_bytree=0.53 vs. 0.8)
+
+That combination — more model capacity paired with stronger regularization and aggressive feature dropout — is the kind of non-obvious balance that optimizers exist to find. You wouldn't reach for `max_depth=9` and `colsample_bytree=0.53` by hand. The default "safe" configuration is shallower trees with broader feature inclusion, and it scored 0.197. EOA found a deeper, more regularized, more stochastic configuration that scored 0.183.
+
+Ax, by contrast, converged on `max_depth=4` with `colsample_bytree=0.5` and a much higher `reg_lambda=5.0` — a different philosophy (shallow + heavy L2). It wasn't bad at 0.191, but the GP surrogate seems to have settled into that region early and kept refining there.
+
+---
+
+## Why EOA Won (Mostly)
+
+After watching both optimizers run, I have a few theories about why EOA dominated:
+
+**1. Exploration vs. exploitation timing.** Ax builds a Gaussian Process surrogate and starts exploiting promising regions quickly — that's the whole point of sample-efficient Bayesian Optimization. But the GBM hyperparameter landscape has ridges and plateaus. A configuration with `max_depth=4` and one with `max_depth=9` can both look locally optimal, but they represent fundamentally different model architectures. EOA's population-based search maintained diverse candidates across both regimes simultaneously, increasing its odds of finding the globally better one.
+
+**2. The search space was moderately sized.** With 3–7 dimensions per model, the search wasn't so large that EOA would struggle with convergence, but it was complex enough that BO's surrogate could get misled. This seems to be EOA's sweet spot — problems too rugged for a smooth GP approximation but small enough that a population of 30 candidates can cover the space.
+
+**3. Interaction effects between hyperparameters.** Tree depth, learning rate, and regularization don't act independently — the optimal regularization strength depends on the depth, which depends on the learning rate. These interaction effects create the kind of multi-modal landscape where population-based search excels. The GP surrogate can model interactions, but it needs enough diverse observations to learn them; EOA explores them by construction.
+
+**The exception — Ax winning on Dataset B's XGBoost — is also telling.** The smaller dataset means each CV fold has fewer validation examples, making the Brier estimate noisier. In noisy settings, BO's surrogate can actually help by smoothing over evaluation noise. EOA optimizes the raw signal, noise included. With a margin of just 0.001, this might simply be EOA chasing noise in one particular region while Ax's smoothing happened to land closer to the true optimum.
+
+---
+
+## What I'd Do Differently
+
+**Run both.** This is the biggest takeaway. The compute cost of running EOA alongside Ax was trivial compared to the overall training budget — the tuning script ran both in sequence and just picked the winner per model. If I'd only run Ax, I would have left significant performance on the table for five out of six models. If I'd only run EOA, I would have missed the best XGBoost configuration on Dataset B by a hair.
+
+**Warm-start EOA with BO results.** In my previous post, I suggested using a short BO run to find a promising region, then seeding an EOA population around it. I didn't implement that here — both optimizers started from scratch. But looking at the results, Ax consistently found *reasonable* configurations fast (its early trials were competitive), while EOA needed more iterations to converge. A hybrid approach could get the best of both: BO's fast initial convergence plus EOA's superior exploration.
+
+**Increase EOA population size for smaller datasets.** On Dataset B, EOA's margins were tighter. With noisier evaluations, a larger population (50 instead of 30) might help smooth out the signal by averaging over more candidates per generation. Worth testing.
+
+---
+
+## Where EOA Didn't Win: Ensemble Weight Tuning
+
+There's a second optimization problem in this pipeline that tells the opposite story. After tuning each model's hyperparameters, I needed to find the optimal *blend weights* — how much to trust each model in the final ensemble. Same three-way comparison: EOA vs. Ax/BoTorch vs. scipy's Nelder-Mead.
+
+| Method | Dataset A | Dataset B |
+|--------|-----------|-----------|
+| Scipy | 0.1800 | **0.1263** |
+| EOA | 0.1802 | 0.1266 |
+| Ax | **0.1799** | 0.1263 |
+
+EOA came in last both times. Ax won Dataset A by a hair; scipy won Dataset B (tying Ax). The margins are tiny — all three methods landed within 0.0003 of each other — but the pattern is clear.
+
+The difference? Weight optimization is a smooth, low-dimensional problem. You're blending five model predictions with five weights that sum to one. There are no ridges, no discrete jumps, no interaction effects. The loss surface is nearly convex. This is exactly the terrain where a GP surrogate (Ax) or a simplex method (Nelder-Mead) excels — and where maintaining a population of 20 diverse candidates adds overhead without adding insight.
+
+It's a clean illustration of the principle from the first post: **the right optimizer depends on the problem structure.** EOA dominated the rugged, 7-dimensional hyperparameter landscapes where tree depth interacts with learning rate interacts with regularization. But on a smooth 5-dimensional weight-mixing surface, the surgeon beats the survivor.
+
+The practical takeaway: I now run EOA for model hyperparameter tuning and scipy for ensemble weights. Ax is a solid all-rounder but doesn't justify the compute cost when scipy matches it in milliseconds on the simple problems, and EOA beats it on the hard ones.
+
+---
+
+## From Theory to Practice
+
+When I wrote the first post, I framed EOA as a theoretical alternative worth considering "in the right context." Having now run it head-to-head against Bayesian Optimization on real models with real stakes, I can be more specific:
+
+**EOA is not just a theoretical alternative. It's a practical one.** On gradient boosting models with moderately complex search spaces (3–7 dimensions), EOA consistently found better configurations than Ax/BoTorch — an optimizer I've used and trusted across multiple projects. The population-based search found configurations that the GP surrogate missed, including high-capacity architectures with compensating regularization that wouldn't be intuitive starting points.
+
+Bayesian Optimization is still excellent when you need sample efficiency above all else — when every evaluation is expensive and you can only afford 20–50 trials. But if you can afford 100+ evaluations (and with GBMs you usually can), running EOA alongside BO is cheap insurance against getting stuck in the wrong neighborhood.
+
+The earthworms earned their keep.
+
+---
+
+## Update: Competition Results
+
+After publishing the initial results above, I caught a bug in my pipeline: the ensemble weight optimization was running against *untuned* model predictions, even though the individual models had already been tuned. The tuned hyperparameters were saved correctly — they just weren't being passed through to the ensemble step. A classic integration bug.
+
+Once I fixed the param flow and re-optimized weights on the properly tuned predictions, the results jumped again:
+
+| Metric | Before Fix | After Fix | Improvement |
+|--------|-----------|-----------|-------------|
+| Dataset A ensemble (CV) | 0.195 | **0.180** | -7.7% |
+| Dataset B ensemble (CV) | 0.139 | **0.126** | -9.4% |
+| Competition leaderboard | 0.036 | **0.004** | -89% |
+
+An 89% reduction in leaderboard score from a pipeline fix — not a new model, not more data, not a fancier architecture. Just making sure the tuned parameters actually reached the code that needed them.
+
+The weight distribution shifted dramatically once the models were properly tuned. One model that had been nearly zeroed out (4% weight) jumped to 34% — it was always capable, the optimizer just couldn't see it through the untuned predictions. Another model that had been excluded entirely earned a 32% weight in the other dataset's ensemble.
+
+The lesson: optimization is only as good as the pipeline it runs in. You can tune hyperparameters all day, but if the results don't flow through to the final prediction, you're leaving performance on the table.
+
+---
+
+**Previous post:** [Why Evolution Might Beat Probability in the Fight Against Malware](/blog/evolution-vs-probability-malware-detection)
