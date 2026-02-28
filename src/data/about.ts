@@ -92,6 +92,7 @@ export const timeline: TimelineEntry[] = [
     accentColor: "amber",
     highlights: [
       "Focus areas: machine learning, deep learning, statistical modeling, time series analysis",
+      "2026 Excellence-in-a-Discipline Award — selected by GVSU faculty as most outstanding graduate student",
       "Multiple 1st and 2nd place finishes in class-wide Kaggle competitions",
       "Thesis-track research in predictive analytics and applied ML",
     ],
@@ -154,6 +155,13 @@ export interface Achievement {
 }
 
 export const achievements: Achievement[] = [
+  {
+    id: "excellence-in-discipline",
+    title: " GVSU Excellence-in-a-Discipline Award",
+    subtitle: "Most Outstanding Graduate — Data Science & Analytics M.S. Program",
+    icon: "star",
+    accentColor: "green",
+  },
   {
     id: "kaggle-1st-knn",
     title: "1st Place — Kaggle",
