@@ -56,10 +56,25 @@ const pulseRingVariants = {
   },
 };
 
+const submitBarContainerVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
+} as const;
+
+const submitButtonVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
+} as const;
+
 // ── Component ───────────────────────────────────────────────────────────────
+
+const MIN_PROGRESS_MS = 1800;
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   const form = useForm<ContactFormValues>({
@@ -68,7 +83,12 @@ export function ContactForm() {
   });
 
   async function onSubmit(data: ContactFormValues) {
-    const result = await submitContactMessage(data);
+    setSending(true);
+    const [result] = await Promise.all([
+      submitContactMessage(data),
+      new Promise((r) => setTimeout(r, MIN_PROGRESS_MS)),
+    ]);
+    setSending(false);
     if (result.success) {
       setSubmitted(true);
     } else {
@@ -207,36 +227,82 @@ export function ContactForm() {
                   </p>
                 )}
 
-                {/* Submit Button */}
-                <motion.div
-                  whileHover={
-                    prefersReducedMotion ? undefined : { scale: 1.02 }
-                  }
-                  whileTap={
-                    prefersReducedMotion ? undefined : { scale: 0.98 }
-                  }
-                  transition={{
-                    type: "spring",
-                    stiffness: 400,
-                    damping: 17,
-                  }}
-                >
-                  <button
-                    type="submit"
-                    disabled={form.formState.isSubmitting}
-                    className={cn(
-                      "w-full border border-accent-cyan px-8 py-3",
-                      "font-heading text-sm tracking-wider text-accent-cyan",
-                      "transition-all duration-300",
-                      "hover:bg-accent-cyan/10 hover:shadow-[0_0_25px_rgba(0,240,255,0.3)]",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
-                    )}
-                  >
-                    {form.formState.isSubmitting
-                      ? "SENDING..."
-                      : "SEND MESSAGE"}
-                  </button>
-                </motion.div>
+                {/* Submit Button / Progress Bar */}
+                <AnimatePresence mode="wait">
+                  {sending ? (
+                    <motion.div
+                      key="progress"
+                      variants={submitBarContainerVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="space-y-3"
+                    >
+                      <div className="flex items-center justify-between font-heading text-[11px] tracking-[0.2em]">
+                        <span className="text-accent-cyan">TRANSMITTING</span>
+                        <motion.span
+                          className="text-text-muted"
+                          animate={{ opacity: [0.4, 1, 0.4] }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                          ■ ■ ■
+                        </motion.span>
+                      </div>
+                      <div className="relative h-2 w-full overflow-hidden border border-accent-cyan/30 bg-bg-surface">
+                        <motion.div
+                          className="absolute inset-y-0 left-0 bg-accent-cyan/80"
+                          initial={{ width: "0%" }}
+                          animate={{ width: "85%" }}
+                          transition={{ duration: 3, ease: [0.1, 0.4, 0.2, 1] }}
+                          style={{
+                            boxShadow: "0 0 12px rgba(0, 240, 255, 0.5), 0 0 4px rgba(0, 240, 255, 0.8)",
+                          }}
+                        />
+                        {!prefersReducedMotion && (
+                          <motion.div
+                            className="absolute inset-y-0 w-16 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                            animate={{ left: ["-4rem", "100%"] }}
+                            transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+                          />
+                        )}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="button"
+                      variants={submitButtonVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      <motion.div
+                        whileHover={
+                          prefersReducedMotion ? undefined : { scale: 1.02 }
+                        }
+                        whileTap={
+                          prefersReducedMotion ? undefined : { scale: 0.98 }
+                        }
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 17,
+                        }}
+                      >
+                        <button
+                          type="submit"
+                          className={cn(
+                            "w-full border border-accent-cyan px-8 py-3",
+                            "font-heading text-sm tracking-wider text-accent-cyan",
+                            "transition-all duration-300",
+                            "hover:bg-accent-cyan/10 hover:shadow-[0_0_25px_rgba(0,240,255,0.3)]",
+                          )}
+                        >
+                          SEND MESSAGE
+                        </button>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </form>
             </Form>
           </motion.div>
