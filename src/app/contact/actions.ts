@@ -34,11 +34,12 @@ export async function submitContactMessage(data: {
       return { success: false, error: error.message };
     }
 
-    // Send email notification (non-blocking — don't fail the form if email fails)
+    // Send email notification — non-blocking so a Resend failure doesn't fail the form,
+    // but we properly await and check { data, error } so failures are visible in logs.
     if (process.env.RESEND_API_KEY) {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      resend.emails
-        .send({
+      try {
+        const { data, error: resendError } = await resend.emails.send({
           from: NOTIFICATION_FROM,
           to: NOTIFICATION_TO,
           subject: `New message from ${name}`,
@@ -50,8 +51,17 @@ export async function submitContactMessage(data: {
             `Message:`,
             message,
           ].join("\n"),
-        })
-        .catch((err) => console.error("[CONTACT] Resend error:", err));
+        });
+        if (resendError) {
+          console.error("[CONTACT] Resend API error:", resendError);
+        } else {
+          console.log("[CONTACT] Email sent, id:", data?.id);
+        }
+      } catch (networkErr) {
+        console.error("[CONTACT] Resend network error:", networkErr);
+      }
+    } else {
+      console.warn("[CONTACT] RESEND_API_KEY is not set — email notification skipped.");
     }
 
     return { success: true };
