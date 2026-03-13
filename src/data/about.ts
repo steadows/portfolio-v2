@@ -163,6 +163,13 @@ export const achievements: Achievement[] = [
     accentColor: "green",
   },
   {
+    id: "deans-honor-list-fall-2025",
+    title: "Dean's Honor List — Fall 2025",
+    subtitle: "College of Computing, Grand Valley State University · 3.5+ GPA",
+    icon: "medal",
+    accentColor: "amber",
+  },
+  {
     id: "kaggle-1st-knn",
     title: "1st Place — Kaggle",
     subtitle: "kNN Recommender System (Birds)",
