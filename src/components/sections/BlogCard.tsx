@@ -95,7 +95,7 @@ export function BlogCard({ post }: BlogCardProps) {
   const accent = blogCategoryAccentMap[post.category];
   const colors = accentColorMap[accent];
 
-  const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
+  const formattedDate = new Date(`${post.date}T00:00:00`).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",

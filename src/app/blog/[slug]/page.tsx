@@ -93,7 +93,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const accent = blogCategoryAccentMap[post.category];
   const colors = accentColorMap[accent];
 
-  const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
+  const formattedDate = new Date(`${post.date}T00:00:00`).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -166,7 +166,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             {post.updated && (
               <span className="font-heading text-[10px] tracking-wider text-text-muted/60">
                 Updated{" "}
-                {new Date(post.updated).toLocaleDateString("en-US", {
+                {new Date(`${post.updated}T00:00:00`).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
