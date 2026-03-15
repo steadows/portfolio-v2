@@ -18,6 +18,8 @@ export interface BlogPost {
   category: BlogCategory;
   /** e.g. "8 min read" */
   readTime: string;
+  /** Short subtitle for OG images and social previews */
+  subtitle?: string;
   featured: boolean;
   status: "published" | "draft";
 }

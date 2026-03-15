@@ -32,6 +32,7 @@ export function getAllPosts(): BlogPost[] {
         tags: data.tags ?? [],
         category: data.category ?? "article",
         readTime: data.readTime ?? "5 min read",
+        subtitle: data.subtitle ?? undefined,
         featured: data.featured ?? false,
         status: data.status ?? "published",
       } satisfies BlogPost;
@@ -64,6 +65,7 @@ export function getPostBySlug(
     tags: data.tags ?? [],
     category: data.category ?? "article",
     readTime: data.readTime ?? "5 min read",
+    subtitle: data.subtitle ?? undefined,
     featured: data.featured ?? false,
     status: data.status ?? "published",
   };
