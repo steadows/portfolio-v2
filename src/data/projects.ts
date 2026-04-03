@@ -111,6 +111,128 @@ export const categoryAccentMap: Record<
 };
 
 export const projects: Project[] = [
+  // ─── Research Intelligence Dashboard (Crown Jewel) ────────────────────────
+  {
+    slug: "research-intelligence-dashboard",
+    title: "RESEARCH INTELLIGENCE DASHBOARD",
+    subtitle: "Graph-Powered Research Triage & Agentic Experimentation",
+    category: "ml",
+    tags: [
+      "Graph Algorithms",
+      "Knowledge Management",
+      "Agentic AI",
+      "NLP",
+      "Obsidian",
+      "FastAPI",
+      "Next.js",
+      "NetworkX",
+    ],
+    description:
+      "A personal research intelligence system that ingests newsletters and Instagram content into an Obsidian vault, applies PageRank and community detection for relevance matching, and runs sandboxed AI experiments on promising tools.",
+    longDescription:
+      "Built a graph-powered research triage system that automates newsletter ingestion via Claude Code scheduled tasks, transcribes Instagram reels with Whisper, injects retroactive wiki-links across an Obsidian vault, and applies NetworkX graph algorithms (PageRank, Louvain community detection, Adamic-Adar link prediction) to surface relevant research. A three-tier smart matcher combines explicit links, keyword overlap, and graph-propagated discovery. An agentic research lab evaluates tools in sandboxed Docker containers.",
+    techStack: [
+      "Python",
+      "FastAPI",
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "NetworkX",
+      "Claude API",
+      "faster-whisper",
+      "Docker",
+      "Obsidian",
+    ],
+    image: "/projects/research-intelligence-dashboard-card.png",
+    featured: true,
+    detail: {
+      sections: [
+        {
+          id: "overview",
+          title: "OVERVIEW",
+          content:
+            "The Research Intelligence Dashboard surfaces actionable insights from automated newsletter ingestion, Instagram transcription, and an Obsidian knowledge vault. Rather than reading dozens of research items weekly and guessing which are relevant, the system applies graph algorithms to rank, cluster, and predict connections — then uses Claude API for on-demand relevance scoring.\n\nThe core insight: an Obsidian vault with wiki-links is a graph. By loading it into NetworkX, I can run **PageRank** to find which notes are structurally important, **Louvain community detection** to find topic clusters, and **Adamic-Adar link prediction** to suggest missing connections. These algorithms feed a three-tier smart matcher that surfaces research items by explicit links, keyword overlap, and graph-propagated discovery.",
+        },
+        {
+          id: "ingestion",
+          title: "DATA INGESTION PIPELINE",
+          content:
+            "Three automated pipelines feed structured data into the Obsidian vault:\n\n**Newsletter Ingestion** — Claude Code scheduled tasks run every Monday (JournalClub) and Friday (TLDR). Each agent reads the newsletter from Gmail, downloads cited papers, writes a synthesis per paper, assesses relevance to active projects, and outputs structured markdown with wiki-links.\n\n**Instagram Ingestion** — Instaloader fetches posts from followed agentic engineering creators. faster-whisper (base model, int8 quantized, CPU) transcribes audio. Claude Haiku extracts structured metadata — title, key points, and keywords with wiki-links to relevant projects. Output is written as vault notes with YAML frontmatter.\n\n**Knowledge Linker** — Retroactive wiki-link injection across the entire vault. When a new project or concept is added, the linker scans all existing notes and connects anything that should be linked. Uses 16 aliases per concept, longest-match-first replacement, with protection for code blocks and existing links. The vault's link density doubled on the first run.",
+        },
+        {
+          id: "graph-engine",
+          title: "GRAPH ENGINE & ALGORITHMS",
+          content:
+            "The graph engine loads the Obsidian vault via `obsidiantools.Vault`, builds a MultiDiGraph from wiki-links, and collapses it to a NetworkX DiGraph (removing self-loops and non-existent notes). Nodes are markdown note names; directed edges are wiki-links.\n\n**PageRank** — `nx.pagerank(G)` ranks notes by structural importance. The centrality rank for each note is injected into Claude analysis prompts as graph context, so the LLM knows which projects are structurally central.\n\n**Louvain Community Detection** — `nx.community.louvain_communities(G.to_undirected(), seed=42)` finds topic clusters. Community membership drives Tier 3 matching — if a new paper lands in the same community as a project, the system surfaces it regardless of keyword overlap.\n\n**Adamic-Adar Link Prediction** — `nx.adamic_adar_index()` predicts missing links within a 3-hop neighborhood. Top 10 suggestions surface as recommendations.\n\n**Graph Health Metrics** — node count, edge count, orphan count (degree 0), weakly connected components, bridge count (critical links whose removal fragments the graph). Betweenness centrality skipped for graphs > 1000 nodes as a performance guard.",
+        },
+        {
+          id: "smart-matcher",
+          title: "THREE-TIER SMART MATCHER",
+          content:
+            "The smart matcher connects research items to projects across three confidence tiers:\n\n**Tier 1 — Explicit Links (confidence = 1.0)** — Items with `[[ProjectName]]` wiki-links in vault markdown. Built by `_build_explicit_index()` mapping project names to linked items.\n\n**Tier 2 — Keyword Overlap (confidence 0.3–0.9)** — Tech stack keywords weighted at 0.3 per match, general keywords at 0.1, capped at 0.9. Uses a 169-word stop-word frozenset and recognizes 22 multi-word tech terms (\"retrieval augmented generation\", \"contrastive learning\", etc.) as single tokens.\n\n**Tier 3 — Graph-Propagated Discovery** — Pulls matches from Louvain community peers and Adamic-Adar predictions. Tagged with `discovery_source` and `via_project` for provenance. Limited to 15 community peers to avoid noise.\n\nThe matcher uses a 1-hour TTL cache (`cachetools.TTLCache`) with thread-safe locking. All three tiers compound — an item can have a Tier 1 match to one project and a Tier 3 match to another simultaneously.",
+        },
+        {
+          id: "agentic-research",
+          title: "AGENTIC RESEARCH LAB",
+          content:
+            "The workbench evaluates flagged items through an agentic pipeline with a state machine: `queued → researching → researched → sandbox_creating → sandbox_ready | manual | failed`.\n\n**Research Phase** — Spawns a `claude -p` subprocess (Opus, fallback Sonnet) with COSTAR-structured prompts. Allowed tools include WebSearch, WebFetch, Read, Write, context7, and exa-web-search. Output is a `research.md` with required sections: overview, installation, key APIs, programmatic assessment, experiment design, and safety notes. Cost detection scans for \"subscription\" or \"pricing\" keywords and flags items for manual review.\n\n**Sandbox Phase** — Sonnet generates a Dockerfile (official base image, pinned versions, non-root USER), `experiment.py`, and `run.sh`. Docker runs with `--network none` for full isolation. Output must conform to a structured JSON schema: `{metric_name, baseline, result, improvement, passed, description}`.\n\n**Process Management** — Agents spawn as subprocesses with `start_new_session=True`. Atomic file I/O uses tempfile + `os.replace()` throughout. Vault-sourced text is escaped via `_fmt_safe()` to prevent prompt injection.",
+        },
+        {
+          id: "frontend",
+          title: "FRONTEND & API",
+          content:
+            "**FastAPI Backend** — REST endpoints expose parsed data from the vault. WebSocket support for live updates. Analysis endpoints trigger Claude API calls with SHA-256 cache keys (`v2:{item}:{project}:{type}:{has_graph}`) to prevent re-analysis.\n\n**Next.js Frontend** — React with Tailwind v4 and shadcn/ui. Global feeds show all research items ranked by relevance. Project cockpit views show per-project items with graph context. The workbench UI tracks research and sandbox state transitions in real time.\n\n**Claude API Integration** — 10 analysis functions spanning quick relevance (Haiku, 1024 tokens) to deep analysis (Sonnet, 2048 tokens) to full blog draft generation (Sonnet, 2000 tokens). Graph context — community peers, top 5 neighbors with PageRank scores, top 5 suggested connections with Adamic-Adar scores — is injected into every analysis prompt.\n\n**macOS App Bundle** — Packaged as a native .app with a compiled C wrapper (`launcher-wrapper.c`) + ad-hoc codesign for Sequoia compatibility. Launches Caddy reverse proxy, conda environment, FastAPI, and Next.js.",
+        },
+      ],
+      keyMetrics: [
+        { label: "GRAPH ALGORITHMS", value: "4" },
+        { label: "MATCHING TIERS", value: "3" },
+        { label: "ANALYSIS FUNCTIONS", value: "10" },
+        { label: "VAULT NOTES", value: "362" },
+        { label: "INGESTION SOURCES", value: "3" },
+        { label: "COST PER EVAL", value: "$0.15" },
+      ],
+      screenshots: [
+        {
+          src: "/projects/research-intelligence-dashboard/dashboard-home.png",
+          alt: "Dashboard home view with research feed, intel brief, tools radar, and stats cards",
+          caption: "Dashboard Home — Research Feed & Intel Brief",
+        },
+        {
+          src: "/projects/research-intelligence-dashboard/project-cockpit.png",
+          alt: "Project cockpit showing Computer Vision project with graph visualization and matched items",
+          caption: "Project Cockpit — Per-Project Graph Context & Matched Items",
+        },
+        {
+          src: "/projects/research-intelligence-dashboard/workbench-pipeline.png",
+          alt: "Workbench showing queued, researching, and completed columns for agentic research pipeline",
+          caption: "Workbench — Agentic Research Pipeline",
+        },
+        {
+          src: "/projects/research-intelligence-dashboard/agentic-hub.png",
+          alt: "Agentic Hub with Instagram feed, knowledge linker controls, and signal analysis panel",
+          caption: "Agentic Hub — Instagram Ingestion & Signal Analysis",
+        },
+        {
+          src: "/projects/research-intelligence-dashboard/tools-radar.png",
+          alt: "Tools Radar showing categorized tool summaries with relevance tags",
+          caption: "Tools Radar — Categorized Tool Intelligence",
+        },
+        {
+          src: "/projects/research-intelligence-dashboard/research-archive.png",
+          alt: "Research archive with paper listings showing synthesis, relevance scoring, and project applications",
+          caption: "Research Archive — Paper Synthesis & Relevance Scoring",
+        },
+        {
+          src: "/projects/research-intelligence-dashboard/obsidian-graph.png",
+          alt: "Obsidian vault graph showing community clusters and hub nodes after months of automated linking",
+          caption: "Obsidian Vault Graph — Community Clusters & Hub Nodes",
+        },
+      ],
+      team: ["Steve Meadows"],
+      timeline: "Feb 2026 — Present",
+    },
+  },
   // ─── ML / AI (High Priority) ───────────────────────────────────────────────
   {
     slug: "overwatch",

@@ -35,6 +35,7 @@ export function getAllPosts(): BlogPost[] {
         subtitle: data.subtitle ?? undefined,
         featured: data.featured ?? false,
         status: data.status ?? "published",
+        ogImage: data.ogImage ?? undefined,
       } satisfies BlogPost;
     })
     .filter((post) => post.status === "published")
@@ -68,6 +69,7 @@ export function getPostBySlug(
     subtitle: data.subtitle ?? undefined,
     featured: data.featured ?? false,
     status: data.status ?? "published",
+    ogImage: data.ogImage ?? undefined,
   };
 
   return { post, content };

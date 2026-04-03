@@ -3,6 +3,7 @@ import type { MDXComponents as MDXComponentsType } from "mdx/types";
 import { CodeBlock } from "@/components/blog/CodeBlock";
 import { Callout } from "@/components/blog/Callout";
 import { BlogImage } from "@/components/blog/BlogImage";
+import { Timeline, TimelineItem } from "@/components/blog/Timeline";
 import { cn } from "@/lib/utils";
 
 // ─── MDX Component Map ──────────────────────────────────────────────────────
@@ -239,4 +240,6 @@ export const mdxComponents: MDXComponentsType = {
   // ── Custom Components (available in MDX) ───────────────────────────────────
   Callout,
   BlogImage,
+  Timeline,
+  TimelineItem,
 };

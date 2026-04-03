@@ -22,6 +22,8 @@ export interface BlogPost {
   subtitle?: string;
   featured: boolean;
   status: "published" | "draft";
+  /** Optional background image for OG image generation (path relative to /public) */
+  ogImage?: string;
 }
 
 // ─── Category Metadata ───────────────────────────────────────────────────────

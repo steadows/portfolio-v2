@@ -45,6 +45,18 @@ export default async function OGImage({ params }: { params: Promise<{ slug: stri
   const accent = categoryAccentMap[post.category] ?? categoryAccentMap.article;
   const subtitle = post.subtitle ?? post.excerpt ?? "";
 
+  // Load optional OG background image
+  let ogBgBase64: string | null = null;
+  if (post.ogImage) {
+    try {
+      const ogPath = join(process.cwd(), "public", post.ogImage);
+      const ogData = readFileSync(ogPath);
+      ogBgBase64 = `data:image/png;base64,${ogData.toString("base64")}`;
+    } catch {
+      // Fallback to default background if image not found
+    }
+  }
+
   return new ImageResponse(
     (
       <div
@@ -60,14 +72,26 @@ export default async function OGImage({ params }: { params: Promise<{ slug: stri
           fontFamily: "Inter",
         }}
       >
-        {/* Grid overlay */}
+        {/* Background image + grid overlay combined */}
         <div
           style={{
             position: "absolute",
-            inset: 0,
-            backgroundImage: `linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px)`,
-            backgroundSize: "40px 40px",
+            top: 0,
+            left: 0,
+            width: 1200,
+            height: 630,
             display: "flex",
+            opacity: 0.3,
+            ...(ogBgBase64
+              ? {
+                  backgroundImage: `url(${ogBgBase64})`,
+                  backgroundSize: "1200px 630px",
+                }
+              : {
+                  backgroundImage: `linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px)`,
+                  backgroundSize: "40px 40px",
+                  opacity: 1,
+                }),
           }}
         />
 
