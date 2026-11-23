@@ -5,8 +5,8 @@ import {
   motion,
   AnimatePresence,
   LayoutGroup,
-  useReducedMotion,
 } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { SectionReveal } from "@/components/effects/SectionReveal";
 import { BlogCard } from "@/components/sections/BlogCard";
 import {
@@ -60,6 +60,7 @@ const accentColorMap = {
 // ─── Animation Variants (defined OUTSIDE component) ──────────────────────────
 
 const gridContainerVariants = {
+  still: { opacity: 1, transition: { duration: 0 } },
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -196,9 +197,10 @@ export function BlogFilters({ posts }: BlogFiltersProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeFilter}
-            variants={shouldReduceMotion ? undefined : gridContainerVariants}
+            data-motion-reveal
+            variants={gridContainerVariants}
             initial={shouldReduceMotion ? false : "hidden"}
-            animate="visible"
+            animate={shouldReduceMotion ? "still" : "visible"}
             exit={shouldReduceMotion ? undefined : "exit"}
             className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
           >

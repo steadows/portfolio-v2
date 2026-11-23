@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import {
   LuTrophy,
   LuMedal,
@@ -80,6 +81,7 @@ export function AboutAchievements({ achievements }: AboutAchievementsProps) {
         return (
           <motion.div
             key={a.id}
+            data-motion-reveal
             variants={cardVariants}
             initial="hidden"
             whileInView="visible"

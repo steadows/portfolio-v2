@@ -7,9 +7,9 @@ import { usePathname } from "next/navigation";
 import {
   motion,
   AnimatePresence,
-  useReducedMotion,
   type Variants,
 } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { cn } from "@/lib/utils";
 import { navItems } from "@/data/navigation";
 
@@ -139,7 +139,7 @@ export function Navbar() {
               className="transition-all group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]"
             />
             <span className="hidden text-text-muted sm:inline">
-              //
+              {"//"}
             </span>
             <span className="hidden text-text-secondary sm:inline">
               PORTFOLIO
@@ -308,7 +308,7 @@ export function Navbar() {
               <p className="font-heading text-[10px] tracking-[0.3em] text-text-muted">
                 STEVE MEADOWS{" "}
                 <span className="text-text-muted/60">
-                  // PORTFOLIO
+                  {"// PORTFOLIO"}
                 </span>
               </p>
             </div>

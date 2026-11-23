@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { SiGithub, SiLinkedin } from "react-icons/si";
 import { LuMail } from "react-icons/lu";
 import { HUDBracket } from "@/components/effects/HUDBracket";
@@ -93,6 +94,7 @@ export function ContactSocials() {
       corners={false}
     >
       <motion.div
+        data-motion-reveal
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
@@ -106,6 +108,7 @@ export function ContactSocials() {
           return (
             <motion.a
               key={link.id}
+              data-motion-reveal
               variants={itemVariants}
               href={link.href}
               target={link.icon === "mail" ? undefined : "_blank"}

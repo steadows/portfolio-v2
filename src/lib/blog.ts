@@ -9,56 +9,25 @@ import type { BlogPost } from "@/data/blog";
 
 const CONTENT_DIR = path.join(process.cwd(), "src", "content", "blog");
 
-/**
- * Get all published blog posts, sorted by date (newest first).
- */
-export function getAllPosts(): BlogPost[] {
+function getPostFiles(): string[] {
   if (!fs.existsSync(CONTENT_DIR)) return [];
 
-  const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.endsWith(".mdx"));
-
-  const posts = files
-    .map((filename) => {
-      const filePath = path.join(CONTENT_DIR, filename);
-      const fileContent = fs.readFileSync(filePath, "utf-8");
-      const { data } = matter(fileContent);
-
-      return {
-        slug: filename.replace(/\.mdx$/, ""),
-        title: data.title ?? "Untitled",
-        date: data.date ?? new Date().toISOString(),
-        updated: data.updated ?? undefined,
-        excerpt: data.excerpt ?? "",
-        tags: data.tags ?? [],
-        category: data.category ?? "article",
-        readTime: data.readTime ?? "5 min read",
-        subtitle: data.subtitle ?? undefined,
-        featured: data.featured ?? false,
-        status: data.status ?? "published",
-        ogImage: data.ogImage ?? undefined,
-      } satisfies BlogPost;
-    })
-    .filter((post) => post.status === "published")
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-  return posts;
+  return fs.readdirSync(CONTENT_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && path.extname(entry.name) === ".mdx")
+    .map((entry) => entry.name);
 }
 
-/**
- * Get a single post by slug. Returns the frontmatter + raw MDX content.
- */
-export function getPostBySlug(
-  slug: string
+function readPublishedPost(
+  filename: string
 ): { post: BlogPost; content: string } | null {
-  const filePath = path.join(CONTENT_DIR, `${slug}.mdx`);
-
-  if (!fs.existsSync(filePath)) return null;
-
+  const filePath = path.join(CONTENT_DIR, filename);
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);
+  const status = data.status ?? "published";
+  if (status !== "published") return null;
 
   const post: BlogPost = {
-    slug,
+    slug: path.basename(filename, ".mdx"),
     title: data.title ?? "Untitled",
     date: data.date ?? new Date().toISOString(),
     updated: data.updated ?? undefined,
@@ -68,23 +37,34 @@ export function getPostBySlug(
     readTime: data.readTime ?? "5 min read",
     subtitle: data.subtitle ?? undefined,
     featured: data.featured ?? false,
-    status: data.status ?? "published",
+    status,
     ogImage: data.ogImage ?? undefined,
   };
 
   return { post, content };
 }
 
+/** Get all published posts, sorted by date (newest first). */
+export function getAllPosts(): BlogPost[] {
+  const posts: BlogPost[] = [];
+  for (const filename of getPostFiles()) {
+    const result = readPublishedPost(filename);
+    if (result) posts.push(result.post);
+  }
+  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
+/** Match an exact directory entry before opening a post. */
+export function getPostBySlug(slug: string) {
+  const filename = getPostFiles().find((name) => name === `${slug}.mdx`);
+  return filename ? readPublishedPost(filename) : null;
+}
+
 /**
  * Get all post slugs for generateStaticParams.
  */
 export function getPostSlugs(): string[] {
-  if (!fs.existsSync(CONTENT_DIR)) return [];
-
-  return fs
-    .readdirSync(CONTENT_DIR)
-    .filter((f) => f.endsWith(".mdx"))
-    .map((f) => f.replace(/\.mdx$/, ""));
+  return getAllPosts().map((post) => post.slug);
 }
 
 /**

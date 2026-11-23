@@ -5,8 +5,8 @@ import {
   motion,
   AnimatePresence,
   LayoutGroup,
-  useReducedMotion,
 } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import type { IconType } from "react-icons";
 import {
   SiPython,
@@ -149,6 +149,7 @@ const accentColorMap = {
 
 /** Fade + slide for tab content panel on switch */
 const tabContentVariants = {
+  still: { opacity: 1, y: 0, transition: { duration: 0 } },
   hidden: { opacity: 0, y: 12 },
   visible: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -8 },
@@ -156,6 +157,7 @@ const tabContentVariants = {
 
 /** Staggered container for skill items */
 const skillGridVariants = {
+  still: { opacity: 1, transition: { duration: 0 } },
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -168,6 +170,7 @@ const skillGridVariants = {
 
 /** Individual skill item — spring entrance from left */
 const skillItemVariants = {
+  still: { opacity: 1, x: 0, transition: { duration: 0 } },
   hidden: { opacity: 0, x: -12 },
   visible: {
     opacity: 1,
@@ -296,7 +299,7 @@ export function TechArsenalSection() {
                         isActive ? colors.text : "text-text-muted"
                       )}
                     >
-                      {category.index} //
+                      {category.index}{" //"}
                     </p>
 
                     {/* Category name */}
@@ -338,9 +341,10 @@ export function TechArsenalSection() {
             id={`tabpanel-${activeCategory}`}
             role="tabpanel"
             aria-labelledby={`tab-${activeCategory}`}
-            variants={shouldReduceMotion ? undefined : tabContentVariants}
+            data-motion-reveal
+            variants={tabContentVariants}
             initial={shouldReduceMotion ? false : "hidden"}
-            animate="visible"
+            animate={shouldReduceMotion ? "still" : "visible"}
             exit={shouldReduceMotion ? undefined : "exit"}
             transition={
               shouldReduceMotion
@@ -368,9 +372,10 @@ export function TechArsenalSection() {
 
             {/* Skills grid — staggered entrance */}
             <motion.div
-              variants={shouldReduceMotion ? undefined : skillGridVariants}
+              data-motion-reveal
+              variants={skillGridVariants}
               initial={shouldReduceMotion ? false : "hidden"}
-              animate="visible"
+              animate={shouldReduceMotion ? "still" : "visible"}
               className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-6"
             >
               {activeData.skills.map((skill) => {
@@ -378,9 +383,8 @@ export function TechArsenalSection() {
                 return (
                   <motion.div
                     key={skill.name}
-                    variants={
-                      shouldReduceMotion ? undefined : skillItemVariants
-                    }
+                    data-motion-reveal
+                    variants={skillItemVariants}
                     whileHover={
                       shouldReduceMotion
                         ? undefined

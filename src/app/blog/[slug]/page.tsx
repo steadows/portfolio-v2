@@ -27,7 +27,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const result = getPostBySlug(slug);
-  if (!result) return { title: "Post Not Found" };
+  if (!result) notFound();
 
   const { post } = result;
   return {

@@ -125,6 +125,7 @@ export default function OGImage() {
         {/* Logo */}
         <img
           src={logoUri}
+          alt=""
           width={140}
           height={140}
           style={{

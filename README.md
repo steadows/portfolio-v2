@@ -34,7 +34,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The contact form stores submissions in Supabase. To enable:
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Run the migration in **SQL Editor** → paste contents of `supabase/migrations/20250215000000_create_messages_table.sql`
+2. In **SQL Editor**, run every `.sql` file in [supabase/migrations](supabase/migrations/) once, in ascending filename timestamp order. For an existing project, start with the first unapplied migration.
 3. Copy `.env.example` to `.env.local` and fill in your project URL and service role key (Settings → API)
 4. Add the same env vars to Vercel (Project → Settings → Environment Variables)
 

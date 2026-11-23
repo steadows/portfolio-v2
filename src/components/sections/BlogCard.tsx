@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { LuCalendar, LuClock, LuTag } from "react-icons/lu";
 import type { BlogPost } from "@/data/blog";
 import { blogCategoryAccentMap } from "@/data/blog";
@@ -72,6 +73,7 @@ const categoryLabels: Record<string, string> = {
 // ─── Animation Variants (defined outside component) ──────────────────────────
 
 const cardItemVariants = {
+  still: { opacity: 1, y: 0, transition: { duration: 0 } },
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -103,7 +105,8 @@ export function BlogCard({ post }: BlogCardProps) {
 
   return (
     <motion.div
-      variants={shouldReduceMotion ? undefined : cardItemVariants}
+      data-motion-reveal
+      variants={cardItemVariants}
       whileHover={
         shouldReduceMotion
           ? undefined

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local agent skill templates are outside the application source.
+    ".agents/skills/**",
   ]),
 ]);
 

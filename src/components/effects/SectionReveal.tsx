@@ -4,10 +4,10 @@ import { createContext, useContext, useRef } from "react";
 import {
   motion,
   useInView,
-  useReducedMotion,
   type Variants,
   type UseInViewOptions,
 } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { cn } from "@/lib/utils";
 
 type ViewportMargin = UseInViewOptions["margin"];
@@ -53,8 +53,7 @@ const revealVariants: Record<RevealAnimation, Variants> = {
 
 /** Reduced-motion fallback — instant opacity with no spatial movement */
 const reducedMotionVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
+  visible: { opacity: 1, x: 0, y: 0, scale: 1 },
 };
 
 // ─── Context for stagger groups ──────────────────────────────────────────────
@@ -62,7 +61,7 @@ const reducedMotionVariants: Variants = {
 interface RevealGroupContext {
   animation: RevealAnimation;
   duration: number;
-  shouldReduceMotion: boolean | null;
+  shouldReduceMotion: boolean;
 }
 
 const RevealGroupCtx = createContext<RevealGroupContext | null>(null);
@@ -157,9 +156,10 @@ export function SectionReveal({
   return (
     <motion.div
       ref={ref}
+      data-motion-reveal
       variants={activeVariants}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
+      initial={shouldReduceMotion ? false : "hidden"}
+      animate={shouldReduceMotion || isInView ? "visible" : "hidden"}
       transition={{
         duration: shouldReduceMotion ? 0 : duration,
         delay: shouldReduceMotion ? 0 : delay,
@@ -227,8 +227,8 @@ export function SectionRevealGroup({
       <motion.div
         ref={ref}
         variants={containerVariants}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
+        initial={shouldReduceMotion ? false : "hidden"}
+        animate={shouldReduceMotion || isInView ? "visible" : "hidden"}
         className={cn(className)}
       >
         {children}
@@ -279,7 +279,7 @@ export function SectionRevealItem({
   };
 
   return (
-    <motion.div variants={itemVariants} className={cn(className)}>
+    <motion.div data-motion-reveal variants={itemVariants} className={cn(className)}>
       {children}
     </motion.div>
   );

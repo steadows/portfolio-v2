@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { submitContactMessage } from "@/app/contact/actions";
+import { contactSchema, contactSubmitError, type ContactFormValues } from "@/lib/contact";
 import {
   Form,
   FormControl,
@@ -19,16 +20,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { HUDBracket } from "@/components/effects/HUDBracket";
 import { cn } from "@/lib/utils";
 import { formFields, contactCopy } from "@/data/contact";
-
-// ── Zod Schema ──────────────────────────────────────────────────────────────
-
-const contactSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().min(1, "Email is required").email("Invalid email format"),
-  message: z.string().min(10, "Message too short — minimum 10 characters"),
-});
-
-type ContactFormValues = z.infer<typeof contactSchema>;
 
 // ── Framer Motion Variants (stable — defined outside component) ─────────────
 
@@ -74,25 +65,27 @@ const MIN_PROGRESS_MS = 1800;
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
-  const [sending, setSending] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: { name: "", email: "", message: "" },
   });
+  const { errors, isSubmitting } = useFormState({ control: form.control });
 
   async function onSubmit(data: ContactFormValues) {
-    setSending(true);
-    const [result] = await Promise.all([
-      submitContactMessage(data),
-      new Promise((r) => setTimeout(r, MIN_PROGRESS_MS)),
-    ]);
-    setSending(false);
-    if (result.success) {
-      setSubmitted(true);
-    } else {
-      form.setError("root", { message: result.error ?? "Failed to send message" });
+    try {
+      const [result] = await Promise.all([
+        submitContactMessage(data),
+        new Promise((r) => setTimeout(r, MIN_PROGRESS_MS)),
+      ]);
+      if (result.success) {
+        setSubmitted(true);
+      } else {
+        form.setError("root", { message: result.error });
+      }
+    } catch {
+      form.setError("root", { message: contactSubmitError });
     }
   }
 
@@ -177,6 +170,7 @@ export function ContactForm() {
           >
             <Form {...form}>
               <form
+                noValidate
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-6"
               >
@@ -221,15 +215,15 @@ export function ContactForm() {
                   />
                 ))}
 
-                {form.formState.errors.root && (
-                  <p className="font-heading text-[10px] tracking-wider text-accent-red">
-                    {form.formState.errors.root.message}
+                {errors.root && (
+                  <p role="alert" className="font-heading text-[10px] tracking-wider text-accent-red">
+                    {errors.root.message}
                   </p>
                 )}
 
                 {/* Submit Button / Progress Bar */}
                 <AnimatePresence mode="wait">
-                  {sending ? (
+                  {isSubmitting ? (
                     <motion.div
                       key="progress"
                       variants={submitBarContainerVariants}

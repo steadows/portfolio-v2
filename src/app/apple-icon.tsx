@@ -27,6 +27,7 @@ export default function AppleIcon() {
       >
         <img
           src={dataUri}
+          alt="Steve Meadows"
           width={180}
           height={180}
           style={{ objectFit: "cover", borderRadius: "36px" }}
