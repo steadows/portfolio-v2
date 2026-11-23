@@ -37,8 +37,7 @@ export function Footer() {
           &copy; {currentYear}{" "}
           <span className="text-text-secondary">STEVE MEADOWS</span>
           <span className="hidden sm:inline">
-            {" "}
-            // All rights reserved
+            {" // All rights reserved"}
           </span>
         </p>
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { cn } from "@/lib/utils";
 import { philosophy } from "@/data/about";
 import { HUDBracket } from "@/components/effects/HUDBracket";
@@ -44,6 +45,7 @@ export function AboutPhilosophy() {
         return (
           <motion.div
             key={principle.id}
+            data-motion-reveal
             variants={cardVariants}
             initial="hidden"
             whileInView="visible"

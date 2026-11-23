@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useMemo } from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
 
 // ─── Timeline Component ────────────────────────────────────────────────────
@@ -26,17 +26,17 @@ const nodeStyle = {
   shadow: "0 0 8px rgba(0, 240, 255, 0.4)",
 };
 
-const TimelineCounterContext = createContext<{ next: () => number }>({ next: () => 1 });
-
 export function Timeline({ children }: TimelineProps) {
-  let counter = 0;
-  const items = React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      counter += 1;
-      return React.cloneElement(child as React.ReactElement<{ index?: number }>, { index: counter });
+  const items: React.ReactNode[] = [];
+  let index = 1;
+  for (const child of React.Children.toArray(children)) {
+    if (React.isValidElement<{ index?: number }>(child)) {
+      items.push(React.cloneElement(child, { index }));
+      index += 1;
+    } else {
+      items.push(child);
     }
-    return child;
-  });
+  }
 
   return (
     <div className="relative my-8 ml-1">

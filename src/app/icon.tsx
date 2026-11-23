@@ -27,6 +27,7 @@ export default function Icon() {
       >
         <img
           src={dataUri}
+          alt="Steve Meadows"
           width={32}
           height={32}
           style={{ objectFit: "cover", borderRadius: "4px" }}

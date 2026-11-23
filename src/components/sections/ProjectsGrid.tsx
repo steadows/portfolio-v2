@@ -5,14 +5,13 @@ import {
   motion,
   AnimatePresence,
   LayoutGroup,
-  useReducedMotion,
 } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { SectionReveal } from "@/components/effects/SectionReveal";
 import { ProjectCard } from "@/components/sections/ProjectCard";
 import {
   projects,
   categoryMeta,
-  totalProjectCount,
   type ProjectCategory,
 } from "@/data/projects";
 import { cn } from "@/lib/utils";
@@ -62,6 +61,7 @@ const accentColorMap = {
 
 /** Container for staggered card entrance */
 const gridContainerVariants = {
+  still: { opacity: 1, transition: { duration: 0 } },
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -238,9 +238,10 @@ export function ProjectsGrid() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeFilter}
-            variants={shouldReduceMotion ? undefined : gridContainerVariants}
+            data-motion-reveal
+            variants={gridContainerVariants}
             initial={shouldReduceMotion ? false : "hidden"}
-            animate="visible"
+            animate={shouldReduceMotion ? "still" : "visible"}
             exit={shouldReduceMotion ? undefined : "exit"}
             className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
           >

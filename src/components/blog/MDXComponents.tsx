@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { MDXComponents as MDXComponentsType } from "mdx/types";
 import { CodeBlock } from "@/components/blog/CodeBlock";
@@ -229,10 +230,13 @@ export const mdxComponents: MDXComponentsType = {
   ),
 
   // ── Images ─────────────────────────────────────────────────────────────────
-  img: ({ src, alt, ...props }) => (
-    <BlogImage
+  img: ({ src, alt, className, ...props }) => (
+    <Image
       src={src ?? ""}
       alt={alt ?? ""}
+      width={720}
+      height={400}
+      className={cn("my-6 h-auto w-full border border-white/5", className)}
       {...props}
     />
   ),

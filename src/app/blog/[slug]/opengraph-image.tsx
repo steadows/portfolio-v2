@@ -22,6 +22,7 @@ export function generateStaticParams() {
 export default async function OGImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const result = getPostBySlug(slug);
+  if (!result) return new Response(null, { status: 404 });
 
   // Load fonts from CDN
   const [interBold, jetbrainsMono] = await Promise.all([
@@ -33,13 +34,6 @@ export default async function OGImage({ params }: { params: Promise<{ slug: stri
   const logoPath = join(process.cwd(), "public", "logo-og.png");
   const logoData = readFileSync(logoPath);
   const logoBase64 = `data:image/png;base64,${logoData.toString("base64")}`;
-
-  if (!result) {
-    return new ImageResponse(
-      <div style={{ width: "100%", height: "100%", background: "#0a0a0f", display: "flex" }} />,
-      { ...size }
-    );
-  }
 
   const { post } = result;
   const accent = categoryAccentMap[post.category] ?? categoryAccentMap.article;
@@ -147,6 +141,7 @@ export default async function OGImage({ params }: { params: Promise<{ slug: stri
             {/* Logo */}
             <img
               src={logoBase64}
+              alt=""
               width={56}
               height={56}
               style={{ borderRadius: "50%", border: `2px solid ${accent.primary}40` }}

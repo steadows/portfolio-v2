@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useCustomCursorEnabled } from "@/hooks/useMediaPreference";
 
 /**
  * Custom cursor effect — desktop only.
@@ -17,8 +18,11 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
  * - No `mouseenter` needed — `mousemove` handles everything
  */
 export function CursorEffect() {
-  const [isActive, setIsActive] = useState(false);
+  const enabled = useCustomCursorEnabled();
+  return enabled ? <CursorOverlay /> : null;
+}
 
+function CursorOverlay() {
   // ── Direct mouse position (no spring — snappy dot) ──
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
@@ -40,34 +44,28 @@ export function CursorEffect() {
   const smoothDotScale = useSpring(dotScale, { damping: 20, stiffness: 400 });
 
   useEffect(() => {
-    // Gate: touch devices or reduced-motion preference
-    const isTouch = window.matchMedia("(pointer: coarse)").matches;
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    if (isTouch || reducedMotion) return;
-
-    setIsActive(true);
-    document.documentElement.classList.add("cursor-effect-active");
-
     const handleMouseMove = (e: MouseEvent) => {
+      if (!Number.isFinite(e.clientX) || !Number.isFinite(e.clientY)) return;
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
 
-      // Always ensure visibility — mousemove is the single source of truth
-      cursorOpacity.set(1);
+      if (!cursorOpacity.get()) {
+        cursorOpacity.set(1);
+        document.documentElement.classList.add("cursor-effect-active");
+      }
 
       // Detect interactive elements for scale-up effect
-      const target = e.target as HTMLElement;
-      const isInteractive = target.closest(
+      const isInteractive = e.target instanceof Element && e.target.closest(
         "a, button, [data-magnetic], input, textarea, select, [role='button']"
       );
       ringScale.set(isInteractive ? 2 : 1);
     };
 
     // Hide cursor when mouse leaves the viewport entirely
-    const handleMouseLeave = () => cursorOpacity.set(0);
+    const handleMouseLeave = () => {
+      cursorOpacity.set(0);
+      document.documentElement.classList.remove("cursor-effect-active");
+    };
 
     const handleMouseDown = () => dotScale.set(0.6);
     const handleMouseUp = () => dotScale.set(1);
@@ -82,12 +80,9 @@ export function CursorEffect() {
       document.documentElement.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
-      document.documentElement.classList.remove("cursor-effect-active");
+      handleMouseLeave();
     };
   }, [cursorX, cursorY, cursorOpacity, ringScale, dotScale]);
-
-  // Don't render on touch / reduced-motion
-  if (!isActive) return null;
 
   return (
     <>

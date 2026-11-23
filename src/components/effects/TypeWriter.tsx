@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { cn } from "@/lib/utils";
 
 interface TypeWriterProps {
@@ -41,6 +42,8 @@ const cursorGlowMap = {
   red: "text-accent-red text-glow-red",
 } as const;
 
+type Phase = "start" | "typing" | "pausing" | "deleting" | "waiting" | "done";
+
 export function TypeWriter({
   strings,
   speed = 50,
@@ -60,103 +63,82 @@ export function TypeWriter({
   const normalizedStrings = Array.isArray(strings) ? strings : [strings];
   const shouldLoop = normalizedStrings.length > 1 ? loop : false;
 
-  const [displayText, setDisplayText] = useState("");
-  const [isDone, setIsDone] = useState(false);
-
-  // Use refs for mutable engine state to avoid stale closures
-  const phaseRef = useRef<"idle" | "typing" | "pausing" | "deleting" | "waiting" | "done">("idle");
-  const charIndexRef = useRef(0);
-  const stringIndexRef = useRef(0);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const complete = useEffectEvent(() => onComplete?.());
+  const [frame, setFrame] = useState({
+    phase: "start" as Phase,
+    stringIndex: 0,
+    charCount: 0,
+  });
+  const stringCount = normalizedStrings.length;
+  const currentString = normalizedStrings[frame.stringIndex] ?? "";
 
   useEffect(() => {
-    // Check prefers-reduced-motion
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mql.matches) {
-      setDisplayText(normalizedStrings[0]);
-      setIsDone(true);
-      return;
-    }
+    const { phase, stringIndex, charCount } = frame;
+    if (prefersReducedMotion || !stringCount || phase === "done") return;
 
-    const clear = () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
+    const delay = {
+      start: startDelay,
+      typing: speed,
+      pausing: pauseTime,
+      deleting: deleteSpeed,
+      waiting: pauseBeforeType,
+    }[phase];
 
-    const tick = () => {
-      const phase = phaseRef.current;
-      const si = stringIndexRef.current;
-      const currentString = normalizedStrings[si];
-      const isLastString = si === normalizedStrings.length - 1;
-
-      if (phase === "typing") {
-        if (charIndexRef.current < currentString.length) {
-          charIndexRef.current += 1;
-          setDisplayText(currentString.slice(0, charIndexRef.current));
-          timeoutRef.current = setTimeout(tick, speed);
-        } else {
-          // Finished typing
-          if (shouldLoop || !isLastString) {
-            phaseRef.current = "pausing";
-            timeoutRef.current = setTimeout(tick, pauseTime);
+    const timer = setTimeout(() => {
+      switch (phase) {
+        case "start":
+        case "typing":
+          if (charCount < currentString.length) {
+            setFrame({ phase: "typing", stringIndex, charCount: charCount + 1 });
+          } else if (shouldLoop || stringIndex < stringCount - 1) {
+            setFrame({ ...frame, phase: "pausing" });
           } else {
-            phaseRef.current = "done";
-            setIsDone(true);
-            onComplete?.();
+            setFrame({ ...frame, phase: "done" });
+            complete();
           }
-        }
-      } else if (phase === "pausing") {
-        phaseRef.current = "deleting";
-        timeoutRef.current = setTimeout(tick, deleteSpeed);
-      } else if (phase === "deleting") {
-        if (charIndexRef.current > 0) {
-          charIndexRef.current -= 1;
-          setDisplayText(currentString.slice(0, charIndexRef.current));
-          timeoutRef.current = setTimeout(tick, deleteSpeed);
-        } else {
-          // Move to next string
-          const nextIndex = shouldLoop
-            ? (si + 1) % normalizedStrings.length
-            : si + 1;
-
-          if (nextIndex < normalizedStrings.length || shouldLoop) {
-            stringIndexRef.current = nextIndex % normalizedStrings.length;
-            phaseRef.current = "waiting";
-            timeoutRef.current = setTimeout(tick, pauseBeforeType);
+          break;
+        case "pausing":
+          setFrame({ ...frame, phase: "deleting" });
+          break;
+        case "deleting":
+          if (charCount > 0) {
+            setFrame({ ...frame, charCount: charCount - 1 });
           } else {
-            phaseRef.current = "done";
-            setIsDone(true);
-            onComplete?.();
+            setFrame({
+              phase: "waiting",
+              stringIndex: (stringIndex + 1) % stringCount,
+              charCount: 0,
+            });
           }
-        }
-      } else if (phase === "waiting") {
-        charIndexRef.current = 0;
-        phaseRef.current = "typing";
-        timeoutRef.current = setTimeout(tick, speed);
+          break;
+        case "waiting":
+          setFrame({ ...frame, phase: "typing" });
+          break;
       }
-    };
+    }, delay);
 
-    // Start the engine after delay
-    timeoutRef.current = setTimeout(() => {
-      phaseRef.current = "typing";
-      charIndexRef.current = 0;
-      stringIndexRef.current = 0;
-      tick();
-    }, startDelay);
-
-    return clear;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => clearTimeout(timer);
+  }, [
+    prefersReducedMotion, frame, currentString, stringCount, shouldLoop,
+    startDelay, speed, pauseTime, deleteSpeed, pauseBeforeType,
+  ]);
 
   return (
     <Tag
       className={cn("font-heading", className)}
       aria-label={normalizedStrings.join(", ")}
     >
-      <span aria-hidden="true">{displayText}</span>
+      <span aria-hidden="true" className="hidden motion-reduce:inline">
+        {normalizedStrings[0]}
+      </span>
+      <span aria-hidden="true" className="motion-reduce:hidden">
+        {currentString.slice(0, frame.charCount)}
+      </span>
       {showCursor && (
         <span
           className={cn(
-            "ml-[1px] inline-block animate-typing-cursor",
+            "ml-[1px] inline-block motion-safe:animate-typing-cursor",
             cursorGlowMap[cursorColor],
             cursorClassName
           )}

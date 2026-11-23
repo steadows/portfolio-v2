@@ -125,6 +125,7 @@ export default function TwitterImage() {
         {/* Logo */}
         <img
           src={logoUri}
+          alt=""
           width={140}
           height={140}
           style={{

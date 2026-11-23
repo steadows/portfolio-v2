@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { cn } from "@/lib/utils";
 import { type TimelineEntry } from "@/data/about";
 import { HUDBracket } from "@/components/effects/HUDBracket";
@@ -26,13 +27,6 @@ const textColorMap: Record<string, string> = {
   green: "text-accent-green",
   amber: "text-accent-amber",
   red: "text-accent-red",
-};
-
-const borderColorMap: Record<string, string> = {
-  cyan: "border-accent-cyan/20",
-  green: "border-accent-green/20",
-  amber: "border-accent-amber/20",
-  red: "border-accent-red/20",
 };
 
 const typeBadgeMap: Record<string, { label: string; color: string }> = {
@@ -78,6 +72,7 @@ export function AboutTimeline({ entries }: AboutTimelineProps) {
           return (
             <motion.div
               key={entry.id}
+              data-motion-reveal
               variants={itemVariants}
               initial="hidden"
               whileInView="visible"

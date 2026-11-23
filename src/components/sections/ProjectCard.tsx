@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { LuExternalLink, LuGithub, LuAward } from "react-icons/lu";
 import type { Project } from "@/data/projects";
 import { categoryAccentMap } from "@/data/projects";
@@ -68,6 +69,7 @@ const accentColorMap = {
 // ─── Animation Variants (defined outside component) ─────────────────────────
 
 const cardItemVariants = {
+  still: { opacity: 1, y: 0, transition: { duration: 0 } },
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -93,7 +95,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <motion.div
-      variants={shouldReduceMotion ? undefined : cardItemVariants}
+      data-motion-reveal
+      variants={cardItemVariants}
       whileHover={
         shouldReduceMotion
           ? undefined

@@ -45,7 +45,7 @@ This project follows the GSD (Get Stuff Done) protocol. Before writing any code:
 - Respect `prefers-reduced-motion` — wrap intense animations in `motion-safe:` variants
 
 ### Shadcn/ui
-- Install components via CLI (`npx shadcn-ui@latest add <component>`)
+- Install components with the project's shadcn CLI (`npm exec -- shadcn add <component>`).
 - Components live in `src/components/ui/` — do not modify them unless necessary
 - Extend Shadcn components by wrapping them, not editing the source
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { bio, timeline, achievements, philosophy } from "@/data/about";
+import { bio, timeline, achievements } from "@/data/about";
 import { AboutTimeline } from "@/components/sections/AboutTimeline";
 import { AboutAchievements } from "@/components/sections/AboutAchievements";
 import { AboutPhilosophy } from "@/components/sections/AboutPhilosophy";

@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useMediaPreference";
 import { cn } from "@/lib/utils";
 
 // ── Component ──
@@ -22,15 +23,16 @@ export function ScrollIndicator({
   const scrollOpacity = useTransform(scrollY, [0, 200], [1, 0]);
 
   const handleClick = () => {
+    const behavior = prefersReducedMotion ? "instant" : "smooth";
     if (targetId) {
       const el = document.getElementById(targetId);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
+        el.scrollIntoView({ behavior });
         return;
       }
     }
     // Fallback: scroll down one viewport height
-    window.scrollTo({ top: window.innerHeight, behavior: "smooth" });
+    window.scrollTo({ top: window.innerHeight, behavior });
   };
 
   return (
@@ -56,21 +58,16 @@ export function ScrollIndicator({
       {/* Radar ping + chevron container */}
       <div className="relative flex items-center justify-center">
         {/* Radar ping rings (CSS-animated for performance) */}
-        {!prefersReducedMotion && (
-          <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-            <span className="absolute h-8 w-8 rounded-full border border-accent-cyan/30 motion-safe:animate-radar-ping" />
-            <span
-              className="absolute h-8 w-8 rounded-full border border-accent-cyan/20 motion-safe:animate-radar-ping"
-              style={{ animationDelay: "1s" }}
-            />
-          </div>
-        )}
+        <div className="absolute inset-0 flex items-center justify-center motion-reduce:hidden" aria-hidden="true">
+          <span className="absolute h-8 w-8 rounded-full border border-accent-cyan/30 motion-safe:animate-radar-ping" />
+          <span
+            className="absolute h-8 w-8 rounded-full border border-accent-cyan/20 motion-safe:animate-radar-ping"
+            style={{ animationDelay: "1s" }}
+          />
+        </div>
 
         {/* Chevron arrows — continuous bounce via CSS for performance */}
-        <div className={cn(
-          "relative flex flex-col items-center gap-0.5",
-          !prefersReducedMotion && "motion-safe:animate-scroll-bounce"
-        )}>
+        <div className="relative flex flex-col items-center gap-0.5 motion-safe:animate-scroll-bounce">
           <svg
             width="20"
             height="10"
